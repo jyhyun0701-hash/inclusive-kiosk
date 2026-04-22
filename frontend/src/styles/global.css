@@ -3,18 +3,22 @@
    =========================== */
 
 :root {
-	--bg-primary: #1b2b5e;
-	--bg-secondary: #162248;
-	--bg-card: #243470;
-	--bg-button: #2e4080;
+	--bg-primary: #FFFFFF;
+	--bg-secondary: #002153;
+	--bg-default: #D6D6D6;
+	--bg-grey: #D6D6D6;
+	--bg-pink: #FFB8F9;
+	--bg-blue: #0848B5;
+	--bg-card: #2E2D2D;
+	--bg-button: #2E2D2D;
 	--bg-button-hover: #3a52a0;
 
-	--text-primary: #ffffff;
-	--text-secondary: #b8c4e0;
+	--text-primary: #000000;
+	--text-secondary: #FFFFFF;
 	--text-muted: #7a8bb0;
 
-	--accent-yellow: #f5a623;
-	--accent-blue: #4a90d9;
+	--accent-yellow: #FFF046;
+	--accent-blue: #7DCDFF;
 	--accent-green: #27ae60;
 	--accent-red: #e74c3c;
 
@@ -29,16 +33,31 @@
 	--bottom-bar-bg: #0f1a3e;
 	--bottom-bar-border: #2e4080;
 
-	--font-size-xs: 11px;
-	--font-size-base: 13px;
-	--font-size-lg: 15px;
-	--font-size-xl: 18px;
-	--font-size-xxl: 22px;
+	/* 폰트 */
+    --font-size-xs:   24px;
+    --font-size-sm:   28px;
+    --font-size-base: 36px;
+    --font-size-lg:   42px;
+    --font-size-xl:   52px;
+    --font-size-xxl:  64px;
 
-	--radius-sm: 5px;
-	--radius-md: 8px;
-	--radius-lg: 14px;
-	--transition: 0.2s ease;
+    /* 스페이싱 토큰 추가 — 하드코딩 px 대체용 */
+    --spacing-xs:  8px;
+    --spacing-sm:  16px;
+    --spacing-md:  24px;
+    --spacing-lg:  40px;
+    --spacing-xl:  64px;
+
+    /* 터치 최소 영역 */
+    --touch-min:   88px;    /* 버튼 min-height 기준 */
+    --touch-bar:   200px;    /* BottomBar 높이 */
+
+    /* 라운딩 — 키오스크답게 더 부드럽게 */
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+
+    --transition: 0.2s ease;
 }
 
 body.high-contrast {
@@ -61,12 +80,22 @@ body.high-contrast {
 	--bottom-bar-border: #ffffff;
 }
 
+/* 줌 모드 — 기본값 대비 +25% 비율로 일관성 있게 */
 body.zoom-mode {
-	--font-size-xs: 13px;
-	--font-size-base: 16px;
-	--font-size-lg: 19px;
-	--font-size-xl: 22px;
-	--font-size-xxl: 28px;
+    --font-size-xs:   30px;   /* 24 × 1.25 */
+    --font-size-sm:   35px;   /* 28 × 1.25 */
+    --font-size-base: 40px;   /* 32 × 1.25 */
+    --font-size-lg:   50px;   /* 40 × 1.25 */
+    --font-size-xl:   65px;   /* 52 × 1.25 */
+    --font-size-xxl:  80px;   /* 64 × 1.25 */
+
+    /* 스페이싱도 함께 확장 */
+    --spacing-md: 30px;
+    --spacing-lg: 50px;
+    --spacing-xl: 80px;
+
+    --touch-min:  104px;
+    --touch-bar:  112px;
 }
 
 /* ===== 리셋 ===== */

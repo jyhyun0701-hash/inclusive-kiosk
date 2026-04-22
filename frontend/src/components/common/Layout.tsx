@@ -56,8 +56,7 @@ const Screen = styled.div`
 const Main = styled.main`
   flex: 1;
   min-height: 0;       /* flex 자식의 overflow 허용을 위해 필수 */
-  overflow-y: auto;    /* 콘텐츠 많을 때 스크롤 */
-  overflow-x: hidden;
+  overflow: hidden;
   padding: 16px 20px;
 
   scrollbar-width: none;

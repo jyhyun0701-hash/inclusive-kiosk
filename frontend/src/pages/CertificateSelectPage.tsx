@@ -309,7 +309,7 @@ const ContentArea = styled.div`
 	gap: 12px;
 	flex: 1;
 	min-height: 0; /* ← zoom 시 스크롤 허용 */
-	overflow-y: auto;
+	overflow-y: hidden;
 	scrollbar-width: none;
 	&::-webkit-scrollbar {
 		display: none;

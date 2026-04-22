@@ -172,7 +172,7 @@ const ModalBox = styled.div`
 	border-radius: var(--radius-lg);
 	width: min(520px, 92%);
 	max-height: 80%;
-	overflow-y: auto;
+	overflow-y: hidden;
 	display: flex;
 	flex-direction: column;
 	scrollbar-width: none;
