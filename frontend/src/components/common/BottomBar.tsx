@@ -6,6 +6,11 @@ import { useAccessibility } from '../../context/AccessibilityContext';
 import { useFocusManagerContext } from '../../context/FocusManagerContext';
 import { useKeypadContext } from '../../App';
 import { speakPriority, speakSafe, stopSpeak, setGlobalTts } from '../../utils/speakSafe';
+import imgInfo     from '../../assets/images/info.png';
+import imgSoundOn  from '../../assets/images/sound-on.png';
+import imgSoundOff from '../../assets/images/sound-off.png';
+import imgZoomIn   from '../../assets/images/zoom-in.png';
+import imgZoomOut  from '../../assets/images/zoom-out.png';
 
 /**
  * 키오스크 하단 바
@@ -85,192 +90,232 @@ const BottomBar = ({ showHomeButton = false }: BottomBarProps) => {
   };
 
   return (
-      <>
-        <Wrapper role="toolbar" aria-label="접근성 도구 모음">
+    <>
+      <Wrapper role="toolbar" aria-label="접근성 도구 모음">
 
-          {/* 처음으로 — 왼쪽 끝 */}
-          {showHomeButton && (
-            <HomeButton
-              onClick={handleHome}
-              data-tabfocus="Y"
-              data-tabgroup="bottombar"
-              tabIndex={3}
-              data-ttsmsg="처음으로."
-              aria-label="처음 화면으로"
-            >
-              <BtnIcon aria-hidden="true">⌂</BtnIcon>
-              <BtnLabel>처음으로</BtnLabel>
-            </HomeButton>
-          )}
+        {/* ── 처음으로 (왼쪽) ── */}
+        {showHomeButton && (
+          <HomeButton
+            onClick={handleHome}
+            data-tabfocus="Y"
+            data-tabgroup="bottombar"
+            tabIndex={3}
+            data-ttsmsg="처음으로."
+            aria-label="처음 화면으로"
+          >
+            <BtnLabel>처음으로</BtnLabel>
+          </HomeButton>
+        )}
 
-          {/* 오른쪽 버튼 그룹 */}
-          <RightGroup>
-            <BarButton
-              onClick={handleGuideOpen}
-              data-tabfocus="Y"
-              data-tabgroup="bottombar"
-              tabIndex={0}
-              data-ttsmsg="이용 안내."
-              aria-label="이용 안내"
-            >
-              <IconCircle aria-hidden="true">?</IconCircle>
-              <BtnLabel>이용 안내</BtnLabel>
-            </BarButton>
+        {/* ── 우측 버튼 그룹 ── */}
+        <RightGroup>
 
-            <BarButton
-              onClick={handleTTSToggle}
-              data-tabfocus="Y"
-              data-tabgroup="bottombar"
-              tabIndex={1}
-              data-ttsmsg={ttsEnabled ? '음성 끄기.' : '음성 켜기.'}
-              aria-label={ttsEnabled ? '음성 끄기' : '음성 켜기'}
-              aria-pressed={ttsEnabled}
-              $isActive={ttsEnabled}
-            >
-              <BtnIcon aria-hidden="true">{ttsEnabled ? '🔊' : '🔇'}</BtnIcon>
-              <BtnLabel>{ttsEnabled ? '음성 끄기' : '음성 켜기'}</BtnLabel>
-            </BarButton>
+          {/* 이용 안내 */}
+          <BarButton
+            onClick={handleGuideOpen}
+            data-tabfocus="Y"
+            data-tabgroup="bottombar"
+            tabIndex={0}
+            data-ttsmsg="이용 안내."
+            aria-label="이용 안내"
+          >
+            <BtnImg src={imgInfo} alt="" aria-hidden="true" />
+            <BtnLabel>이용 안내</BtnLabel>
+          </BarButton>
 
-            <ZoomButton
-              onClick={handleZoomToggle}
-              data-tabfocus="Y"
-              data-tabgroup="bottombar"
-              tabIndex={2}
-              data-ttsmsg={zoomEnabled ? '화면 축소.' : '화면 확대.'}
-              aria-label={zoomEnabled ? '화면 축소' : '화면 확대'}
-              aria-pressed={zoomEnabled}
-              $isActive={zoomEnabled}
-            >
-              <BtnIcon aria-hidden="true">🔍</BtnIcon>
-              <BtnLabel>{zoomEnabled ? '화면 축소' : '화면 확대'}</BtnLabel>
-            </ZoomButton>
-          </RightGroup>
-        </Wrapper>
+          {/* 음성 켜기 / 끄기 */}
+          <BarButton
+            onClick={handleTTSToggle}
+            data-tabfocus="Y"
+            data-tabgroup="bottombar"
+            tabIndex={1}
+            data-ttsmsg={ttsEnabled ? '음성 끄기.' : '음성 켜기.'}
+            aria-label={ttsEnabled ? '음성 끄기' : '음성 켜기'}
+            aria-pressed={ttsEnabled}
+            $isActive={ttsEnabled}
+          >
+            <BtnImg
+              src={ttsEnabled ? imgSoundOn : imgSoundOff}
+              alt=""
+              aria-hidden="true"
+            />
+            <BtnLabel>{ttsEnabled ? '음성 끄기' : '음성 켜기'}</BtnLabel>
+          </BarButton>
 
-        <GuideModal
-          isOpen={isGuideOpen}
-          onClose={() => setIsGuideOpen(false)}
-          originGroup={guideOriginGroup}
-          originTabindex={guideOriginTabindex}
-        />
-      </>
-    );
-  };
+          {/* 화면 확대 / 축소 */}
+          <ZoomButton
+            onClick={handleZoomToggle}
+            data-tabfocus="Y"
+            data-tabgroup="bottombar"
+            tabIndex={2}
+            data-ttsmsg={zoomEnabled ? '화면 축소.' : '화면 확대.'}
+            aria-label={zoomEnabled ? '화면 축소' : '화면 확대'}
+            aria-pressed={zoomEnabled}
+            $isActive={zoomEnabled}
+          >
+            <BtnImg
+              src={zoomEnabled ? imgZoomOut : imgZoomIn}
+              alt=""
+              aria-hidden="true"
+            />
+            <BtnLabel>{zoomEnabled ? '화면 축소' : '화면 확대'}</BtnLabel>
+          </ZoomButton>
 
-  export default BottomBar;
+        </RightGroup>
+      </Wrapper>
 
-  // ═══════════════════════════════════════════════
-  // Styled Components
-  // ═══════════════════════════════════════════════
+      <GuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+        originGroup={guideOriginGroup}
+        originTabindex={guideOriginTabindex}
+      />
+    </>
+  );
+};
 
-  /** 하단 바 전체 컨테이너 */
-  const Wrapper = styled.div`
-    width: 100%;
-    height: var(--touch-bar);               /* 200px (global.css) */
-    background-color: var(--bottom-bar-bg);
-    border-top: 1px solid var(--bottom-bar-border);
+export default BottomBar;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;         /* 홈버튼(좌) ↔ 버튼그룹(우) */
-    padding: 0 var(--spacing-xl);           /* 0 64px */
-    flex-shrink: 0;
-  `;
+// ═══════════════════════════════════════════════
+// Styled Components
+// ═══════════════════════════════════════════════
 
-  /** 우측 버튼 묶음 */
-  const RightGroup = styled.div`
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);                 /* 24px */
-    margin-left: auto;
-  `;
+// 버튼 높이: 바 전체(200px) - 위아래 여백(40px × 2) = 120px
+const BTN_HEIGHT = 'calc(var(--touch-bar) - var(--spacing-lg) * 2)';
 
-  /** 공통 버튼 베이스 */
-  const BarButton = styled.button<{ $isActive?: boolean }>`
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);                 /* 16px */
+/** 하단 바 전체 컨테이너 */
+const Wrapper = styled.div`
+  width: 100%;
+  height: var(--touch-bar);                     /* 200px */
+  background-color: var(--bottom-bar-bg);       /* #0f1a3e */
+  border-top: 1px solid var(--bottom-bar-border);
 
-    /* 터치 영역: 바 높이(200px)에서 위아래 여백 뺀 값 */
-    height: calc(var(--touch-bar) - var(--spacing-lg) * 2);  /* 200 - 80 = 120px */
-    padding: 0 var(--spacing-lg);           /* 0 40px */
+  display: flex;
+  align-items: center;
+  /* 처음으로(좌) + RightGroup(우) 분리 */
+  justify-content: space-between;
+  padding: 0 var(--spacing-xl);                 /* 0 64px */
+  flex-shrink: 0;
+`;
 
-    border-radius: var(--radius-md);        /* 16px */
-    border: 2px solid ${({ $isActive }) =>
-      $isActive ? 'var(--accent-blue)' : 'var(--border-default)'};
-    background-color: ${({ $isActive }) =>
-      $isActive ? 'rgba(74,144,217,0.15)' : 'transparent'};
+/**
+ * 우측 버튼 묶음
+ * margin-left: auto → showHomeButton=false일 때도 자동으로 오른쪽 정렬
+ */
+const RightGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);                       /* 버튼 간 24px */
+  margin-left: auto;
+`;
 
-    color: var(--text-secondary);
-    font-size: var(--font-size-base);
-    font-weight: 1000;
-    white-space: nowrap;
-    transition: all var(--transition);
+/** 공통 버튼 베이스 (이용 안내 / 음성) */
+const BarButton = styled.button<{ $isActive?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);                       /* 아이콘 ↔ 텍스트 16px */
 
-    &:hover {
-      background-color: var(--bg-button-hover);
-      border-color: var(--accent-blue);
-    }
-    &:focus-visible {
-      outline: 3px solid var(--border-focus);
-      outline-offset: 2px;
-    }
-  `;
+  height: ${BTN_HEIGHT};                        /* 120px */
+  padding: 0 var(--spacing-lg);                 /* 0 40px */
+  border-radius: var(--radius-md);              /* 16px */
 
-  /** 화면 확대 버튼 — 노란색 강조 */
-  const ZoomButton = styled(BarButton)<{ $isActive?: boolean }>`
-    background-color: var(--accent-yellow);
-    border-color: var(--accent-yellow);
-    color: #1B2B5E;
-    font-weight: 700;
+  /* 기본: 회색 테두리 / 활성: 파란 테두리 */
+  border: 2px solid ${({ $isActive }) =>
+    $isActive ? 'var(--accent-blue)' : '#9E9E9E'};
+  background-color: ${({ $isActive }) =>
+    $isActive ? 'rgba(125, 205, 255, 0.15)' : 'transparent'};
 
-    &:hover {
-      background-color: #E0D030;
-      border-color: #E0D030;
-      color: #1B2B5E;
-    }
-  `;
+  color: var(--text-secondary);                 /* #FFFFFF */
+  font-size: var(--font-size-xs);               /* 24px */
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all var(--transition);
 
-  /** 처음으로 버튼 — 왼쪽 배치, 구분선 스타일 */
-  const HomeButton = styled(BarButton)`
-    border: none;
-    border-right: 1px solid var(--bottom-bar-border);
-    border-radius: var(--radius-md);
-    gap: var(--spacing-sm);
-    padding-right: var(--spacing-xl);
-    color: var(--text-primary);
-    background-color: var(--bg-pink);
+  &:hover {
+    border-color: var(--accent-blue);
+    background-color: rgba(125, 205, 255, 0.1);
+  }
+  &:focus-visible {
+    outline: 3px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+`;
 
-    &:hover {
-      color: var(--text-primary);
-      background-color: transparent;
-      border-color: var(--bottom-bar-border);
-    }
-  `;
+/**
+ * 화면 확대 버튼
+ * 기본: 노란 배경(#FFF046) / 확대 중: 파란 테두리(비활성 스타일과 반전)
+ */
+const ZoomButton = styled.button<{ $isActive?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 
-  /** 아이콘 (이모지 / 특수문자) */
-  const BtnIcon = styled.span`
-    font-size: var(--font-size-base);       /* 36px */
-    line-height: 1;
-    flex-shrink: 0;
-  `;
+  height: ${BTN_HEIGHT};
+  padding: 0 var(--spacing-lg);
+  border-radius: var(--radius-md);
 
-  /** 버튼 텍스트 */
-  const BtnLabel = styled.span`
-    font-size: var(--font-size-xs);         /* 24px */
-    font-weight: inherit;
-  `;
+  background-color: ${({ $isActive }) =>
+    $isActive ? 'rgba(125, 205, 255, 0.15)' : 'var(--accent-yellow)'};
+  border: 2px solid ${({ $isActive }) =>
+    $isActive ? 'var(--accent-blue)' : 'var(--accent-yellow)'};
+  color: ${({ $isActive }) =>
+    $isActive ? 'var(--text-secondary)' : '#1B2B5E'};
 
-  /** 이용 안내 물음표 원형 */
-  const IconCircle = styled.span`
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 2px solid var(--text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-sm);         /* 28px */
-    font-weight: 700;
-    flex-shrink: 0;
-  `;
+  font-size: var(--font-size-xs);               /* 24px */
+  font-weight: 700;
+  white-space: nowrap;
+  transition: all var(--transition);
+
+  &:hover { filter: brightness(0.92); }
+  &:focus-visible {
+    outline: 3px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+`;
+
+/**
+ * 처음으로 버튼
+ * - Wrapper의 space-between으로 RightGroup과 자동 분리
+ * - border 방식(구분선) 제거 → 독립된 버튼으로 디자인
+ */
+const HomeButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  height: ${BTN_HEIGHT};                        /* 120px */
+  padding: 0 var(--spacing-xl);                 /* 0 64px — 넉넉한 터치 영역 */
+
+  border: 2px solid #9E9E9E;                    /* 회색 테두리 */
+  border-radius: var(--radius-md);
+  background-color: transparent;
+
+  color: var(--text-secondary);                 /* #FFFFFF */
+  font-size: var(--font-size-xs);               /* 24px */
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all var(--transition);
+
+  &:hover {
+    border-color: var(--accent-blue);
+    background-color: rgba(125, 205, 255, 0.1);
+  }
+  &:focus-visible {
+    outline: 3px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+`;
+
+/** 버튼 텍스트 */
+const BtnLabel = styled.span`
+  font-size: var(--font-size-xs);               /* 24px */
+  font-weight: inherit;
+`;
+
+/** PNG 아이콘 이미지 */
+const BtnImg = styled.img`
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex-shrink: 0;
+`;

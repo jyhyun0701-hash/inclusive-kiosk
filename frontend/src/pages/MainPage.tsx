@@ -7,6 +7,10 @@ import { useFocusManagerContext } from "../context/FocusManagerContext";
 import { fetchCertificates } from "../api/certificateApi";
 import type { Certificate } from "../types/certificate";
 import { FAVORITE_CERTIFICATE_NAMES } from "../types/certificate";
+import imgKr from "../assets/images/kr.png";
+import imgEn from "../assets/images/en.png";
+import imgJp from "../assets/images/jp.png";
+import imgCn from "../assets/images/cn.png";
 
 // ─────────────────────────────────────────────
 // 언어 설정
@@ -26,10 +30,10 @@ const MORE: Record<string, string> = {
 };
 
 const LANGUAGES = [
-	{ code: "ko", label: "한국어", flag: "🇰🇷" },
-	{ code: "en", label: "English", flag: "🇺🇸" },
-	{ code: "ja", label: "日本語", flag: "🇯🇵" },
-	{ code: "zh", label: "中文",   flag: "🇨🇳" },
+	{ code: "ko", label: "한국어", img: imgKr },
+	{ code: "en", label: "English", img: imgEn },
+    { code: "ja", label: "日本語", img: imgJp },
+    { code: "zh", label: "中文",   img: imgCn },
 ] as const;
 
 // ─────────────────────────────────────────────
@@ -170,29 +174,29 @@ const MainPage = () => {
 				</ContentRow>
 
 				{/* ── 언어 선택 ── */}
-				<LangSection>
-					<LangRow role="group" aria-label="언어 선택">
-						{LANGUAGES.map((lang, idx) => {
-							const isActive = language === lang.code;
-							return (
-								<LangBtn
-									key={lang.code}
-									onClick={() => setLanguage(lang.code)}
-									$isActive={isActive}
-									data-tabfocus="Y"
-									data-tabgroup="main"
-									tabIndex={favCerts.length + 1 + idx}
-									data-ttsmsg={`${lang.label} 선택.`}
-									aria-label={lang.label}
-									aria-pressed={isActive}
-								>
-									<LangFlag aria-hidden="true">{lang.flag}</LangFlag>
-									<LangLabel>{lang.label}</LangLabel>
-								</LangBtn>
-							);
-						})}
-					</LangRow>
-				</LangSection>
+                <LangSection>
+                    <LangRow role="group" aria-label="언어 선택">
+                        {LANGUAGES.map((lang, idx) => {
+                            const isActive = language === lang.code;
+                            return (
+                                <LangBtn
+                                    key={lang.code}
+                                    onClick={() => setLanguage(lang.code)}
+                                    $isActive={isActive}
+                                    data-tabfocus="Y"
+                                    data-tabgroup="main"
+                                    tabIndex={favCerts.length + 1 + idx}
+                                    data-ttsmsg={`${lang.label} 선택.`}
+                                    aria-label={lang.label}
+                                    aria-pressed={isActive}
+                                >
+                                    <LangFlagImg src={lang.img} alt={lang.label} />
+                                    <LangLabel>{lang.label}</LangLabel>
+                                </LangBtn>
+                            );
+                        })}
+                    </LangRow>
+                </LangSection>
 
 			</PageWrapper>
 		</Layout>
@@ -402,9 +406,11 @@ const LangBtn = styled.button<{ $isActive?: boolean }>`
 	}
 `;
 
-const LangFlag = styled.span`
-	font-size: var(--font-size-xl);
-	line-height: 0.8;
+const LangFlagImg = styled.img`
+	width: 80px;
+    height: 80px;
+    object-fit: cover;
+    flex-shrink: 0;
 `;
 
 const LangLabel = styled.span`
