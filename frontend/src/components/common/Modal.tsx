@@ -53,7 +53,7 @@ const Modal = ({
 					fm.moveTabFocusManual(
 						document,
 						originGroup,
-						originTabindex,
+						originTabindex
 					),
 				100,
 			);
@@ -119,7 +119,7 @@ export default Modal;
 const Overlay = styled.div`
 	position: absolute;
 	inset: 0;
-	background-color: rgba(0, 0, 0, 0.65);
+	background-color: rgba(0, 0, 0, 0.7);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -127,40 +127,41 @@ const Overlay = styled.div`
 `;
 
 const Box = styled.div`
-	background-color: var(--bg-card);
-	border: 1.5px solid var(--border-active);
+	background-color: var(--bg-secondary);
+	border: 2px solid var(--border-blue);
 	border-radius: var(--radius-lg);
-	padding: 28px 32px;
-	width: min(400px, 88%);
+	padding: var(--spacing-xl) var(--spacing-xl);
+	width: min(800px, 88%);
 	text-align: center;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-lg);
 `;
 
 const ModalTitle = styled.h2`
 	font-size: var(--font-size-xl);
 	font-weight: 700;
-	color: var(--text-primary);
-	margin-bottom: 10px;
+	color: var(--text-secondary);
 `;
 
 const ModalMsg = styled.p`
-	font-size: var(--font-size-base);
+	font-size: var(--font-size-lg);
 	color: var(--text-secondary);
 	line-height: 1.6;
-	margin-bottom: 24px;
 	white-space: pre-line;
 `;
 
 const BtnRow = styled.div`
 	display: flex;
-	gap: 10px;
+	gap: var(--spacing-md);
 `;
 
 const Base = styled.button`
 	flex: 1;
-	padding: 13px;
+	min-height: var(--touch-min);
 	border-radius: var(--radius-md);
 	font-size: var(--font-size-base);
-	font-weight: 600;
+	font-weight: 700;
 	transition: all var(--transition);
 	&:focus-visible {
 		outline: 3px solid var(--border-focus);
@@ -170,19 +171,19 @@ const Base = styled.button`
 
 const ConfirmBtn = styled(Base)`
 	background-color: var(--accent-blue);
-	border: 1.5px solid var(--accent-blue);
+	border: 2px solid var(--accent-blue);
 	color: var(--text-primary);
 	&:hover {
-		background-color: #3a7bc8;
-	}
+        filter: brightness(0.9);
+    }
 `;
 
 const CancelBtn = styled(Base)`
 	background-color: transparent;
-	border: 1.5px solid var(--border-default);
+	border: 2px solid #9E9E9E;
 	color: var(--text-secondary);
 	&:hover {
-		background-color: var(--bg-button-hover);
-		color: var(--text-primary);
-	}
+            border-color: var(--accent-blue);
+            background-color: rgba(125, 205, 255, 0.1);
+    }
 `;

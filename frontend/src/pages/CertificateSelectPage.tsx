@@ -114,6 +114,7 @@ const CertificateSelectPage = () => {
 	return (
 		<Layout
 			currentStep={2}
+			title="발급을 원하시는 증명서를 선택해주십시오."
 			modal={
 				<Modal
 					isOpen={isModalOpen}
@@ -133,8 +134,6 @@ const CertificateSelectPage = () => {
 			}
 		>
 			<PageWrapper>
-				<Title>발급을 원하시는 증명서를 선택해주십시오.</Title>
-
 				<ViewToggle>
 					<ToggleBtn
 						$isActive={viewMode === "category"}
@@ -265,38 +264,31 @@ export default CertificateSelectPage;
 const PageWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
-	gap: 18px;
+	gap: var(--spacing-lg);
 	height: 100%;
 	min-height: 0;
 `;
-const Title = styled.h1`
-	font-size: var(--font-size-xl);
-	font-weight: 700;
-	color: var(--text-primary);
-	text-align: center;
-	flex-shrink: 0;
-`;
 const ViewToggle = styled.div`
 	display: flex;
-	gap: 8px;
+	gap: var(--spacing-md);
 	flex-shrink: 0;
 `;
 const ToggleBtn = styled.button<{ $isActive: boolean }>`
-	padding: 8px 18px;
+    min-height: var(--touch-min);
+	padding: 0 var(--spacing-xl);
 	border-radius: var(--radius-md);
-	border: 1.5px solid
+	border: 2px solid
 		${({ $isActive }) =>
 			$isActive ? "var(--accent-blue)" : "var(--border-default)"};
 	background-color: ${({ $isActive }) =>
-		$isActive ? "rgba(74,144,217,0.15)" : "transparent"};
+		$isActive ? "var(--accent-blue)" : "transparent"};
 	color: ${({ $isActive }) =>
-		$isActive ? "var(--text-primary)" : "var(--text-secondary)"};
-	font-size: var(--font-size-base);
-	font-weight: ${({ $isActive }) => ($isActive ? 700 : 400)};
+		$isActive ? "#000000" : "var(--text-primary)"};
+	font-size: var(--font-size-sm);
+	font-weight: ${({ $isActive }) => ($isActive ? 700 : 500)};
 	transition: all var(--transition);
 	&:hover {
 		border-color: var(--accent-blue);
-		color: var(--text-primary);
 	}
 	&:focus-visible {
 		outline: 3px solid var(--border-focus);
@@ -306,9 +298,9 @@ const ToggleBtn = styled.button<{ $isActive: boolean }>`
 const ContentArea = styled.div`
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: var(--spacing-md);
 	flex: 1;
-	min-height: 0; /* ← zoom 시 스크롤 허용 */
+	min-height: 0;
 	overflow-y: hidden;
 	scrollbar-width: none;
 	&::-webkit-scrollbar {
@@ -319,26 +311,26 @@ const CertGrid = styled.ul`
 	list-style: none;
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: 8px;
+	gap: var(--spacing-md);
 `;
 const CertItem = styled.button`
 	width: 100%;
+	min-height: 120px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: 4px;
-	padding: 16px 10px;
-	border-radius: var(--radius-md);
-	border: 1.5px solid var(--border-default);
-	background-color: var(--bg-card);
-	color: var(--text-primary);
-	font-size: var(--font-size-base);
+	gap: var(--spacing-xs);
+    padding: var(--spacing-md) var(--spacing-sm);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border-default);
+    background-color: var(--bg-secondary);
+	color: #FFFFFF;
 	text-align: center;
 	transition: all var(--transition);
 	&:hover {
 		border-color: var(--accent-blue);
-		background-color: rgba(74, 144, 217, 0.1);
+		background-color: #0848B5;
 	}
 	&:focus-visible {
 		outline: 3px solid var(--border-focus);
@@ -346,21 +338,25 @@ const CertItem = styled.button`
 	}
 `;
 const ItemName = styled.span`
+    font-size: var(--font-size-sm);
 	font-weight: 600;
 	line-height: 1.4;
+	color: #ffffff;
 `;
 const ItemFee = styled.span`
-	font-size: 11px;
-	color: var(--text-muted);
+	font-size: var(--font-size-xs);
+	color: var(--accent-blue);
 `;
 const EmptyText = styled.p`
 	text-align: center;
-	color: var(--text-muted);
-	padding: 28px 0;
+	color: var(--text-primary);
+	padding: var(--spacing-xl) 0;
+    font-size: var(--font-size-base);
 	grid-column: 1/-1;
 `;
 const LoadText = styled.p`
-	color: var(--text-muted);
-	text-align: center;
-	padding: 28px 0;
+	color: var(--text-primary);
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+    font-size: var(--font-size-base);
 `;

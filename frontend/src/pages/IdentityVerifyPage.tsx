@@ -139,27 +139,15 @@ const IdentityVerifyPage = () => {
   };
 
   return (
-    <Layout currentStep={3}>
+    <Layout currentStep={3} title="본인 확인을 진행해주십시오.">
       <PageWrapper>
         {selectedCert && (
           <Badge>선택한 증명서: <strong>{selectedCert.nameKo}</strong></Badge>
         )}
 
-        <StepRow>
-          <SDot $active={verifyStep === 'id-input'}    $done={verifyStep === 'fingerprint'}>
-            <SNum>1</SNum><SLbl>주민번호 입력</SLbl>
-          </SDot>
-          <SLine $done={verifyStep === 'fingerprint'} />
-          <SDot $active={verifyStep === 'fingerprint'} $done={false}>
-            <SNum>2</SNum><SLbl>지문 인식</SLbl>
-          </SDot>
-        </StepRow>
-
         {/* ── 주민번호 입력 ── */}
         {verifyStep === 'id-input' && (
           <KSection>
-            <PageTitle>주민번호 13자리를 입력해주십시오.</PageTitle>
-
             <Display role="textbox" aria-label="주민번호 입력창" aria-live="polite">
               {input.length === 0
                 ? <PHint>주민번호를 입력하십시오. 예) 901010-1234567</PHint>
@@ -201,7 +189,6 @@ const IdentityVerifyPage = () => {
         {/* ── 지문 인식 ── */}
         {verifyStep === 'fingerprint' && (
           <FPSection>
-            <PageTitle>지문 입력기에 엄지 손가락을 올려주십시오.</PageTitle>
             <SMsg $s={scanStatus} role="status" aria-live="assertive">
               {scanStatus === 'idle'     && '지문 입력기에 엄지 손가락을 올려주십시오.'}
               {scanStatus === 'scanning' && '지문을 인식하고 있습니다. 잠시 기다려주십시오.'}
@@ -243,45 +230,165 @@ const IdentityVerifyPage = () => {
 export default IdentityVerifyPage;
 
 const FPSVG = ({ sc }: { sc: boolean }) => (
-  <svg width="68" height="68" viewBox="0 0 80 80" fill="none" aria-hidden="true">
-    {["M40 10 C25 10 13 22 13 40 C13 52 18 62 26 68",
-      "M40 18 C29 18 20 28 20 40 C20 50 25 58 32 63",
-      "M40 26 C33 26 28 33 28 40 C28 47 31 53 36 57",
-      "M40 34 C37 34 35 37 35 40 C35 44 37 47 40 50",
-      "M40 18 C51 18 60 28 60 40 C60 50 55 58 48 63",
-      "M40 26 C47 26 52 33 52 40 C52 47 49 53 44 57",
-      "M40 10 C55 10 67 22 67 40 C67 52 62 62 54 68",
-    ].map((d, i) => (
-      <path key={i} d={d} stroke={sc ? '#4A90D9' : '#B8C4E0'}
-        strokeWidth="3" strokeLinecap="round" fill="none"/>
-    ))}
-  </svg>
-);
+     <svg width="100" height="100" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+         {["M40 10 C25 10 13 22 13 40 C13 52 18 62 26 68",
+             "M40 18 C29 18 20 28 20 40 C20 50 25 58 32 63",
+             "M40 26 C33 26 28 33 28 40 C28 47 31 53 36 57",
+             "M40 34 C37 34 35 37 35 40 C35 44 37 47 40 50",
+             "M40 18 C51 18 60 28 60 40 C60 50 55 58 48 63",
+             "M40 26 C47 26 52 33 52 40 C52 47 49 53 44 57",
+             "M40 10 C55 10 67 22 67 40 C67 52 62 62 54 68",
+         ].map((d, i) => (
+             <path key={i} d={d} stroke={sc ? 'var(--accent-blue)' : '#B8C4E0'}
+                 strokeWidth="3" strokeLinecap="round" fill="none"/>
+         ))}
+     </svg>
+ );
 
 const ripple = keyframes`0%{transform:scale(1);opacity:0.6;}100%{transform:scale(2.2);opacity:0;}`;
 
-const PageWrapper   = styled.div`display:flex;flex-direction:column;align-items:center;gap:20px;height:100%;`;
-const Badge         = styled.div`padding:8px 16px;border-radius:var(--radius-md);background-color:rgba(74,144,217,0.12);border:1px solid var(--border-active);color:var(--text-secondary);font-size:var(--font-size-xs);align-self:stretch;text-align:center;strong{color:var(--text-primary);font-weight:700;}`;
-const PageTitle     = styled.h1`font-size:var(--font-size-xl);font-weight:700;color:var(--text-primary);text-align:center;`;
-const StepRow       = styled.div`display:flex;align-items:center;`;
-const SDot          = styled.div<{$active:boolean;$done:boolean}>`display:flex;flex-direction:column;align-items:center;gap:4px;opacity:${({$active,$done})=>$active||$done?1:0.4};`;
-const SNum          = styled.div`width:26px;height:26px;border-radius:50%;background-color:var(--accent-blue);color:var(--text-primary);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;`;
-const SLbl          = styled.span`font-size:11px;color:var(--text-secondary);white-space:nowrap;`;
-const SLine         = styled.div<{$done:boolean}>`width:64px;height:2px;background-color:${({$done})=>$done?'var(--accent-blue)':'var(--border-default)'};margin:0 8px 18px;transition:background-color var(--transition);`;
-const KSection      = styled.div`display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;`;
-const Display       = styled.div`width:min(340px,100%);padding:12px 16px 8px;border-radius:var(--radius-md);border:1.5px solid var(--border-active);background-color:var(--bg-secondary);display:flex;flex-direction:column;gap:8px;`;
-const PHint         = styled.span`color:var(--text-muted);font-size:var(--font-size-xs);`;
-const DText         = styled.span`color:var(--text-primary);font-size:var(--font-size-xl);font-weight:600;letter-spacing:3px;`;
-const PBar          = styled.div`width:100%;height:3px;background-color:var(--border-default);border-radius:2px;overflow:hidden;`;
-const PFill         = styled.div<{$w:number}>`height:100%;width:${({$w})=>$w}%;background-color:var(--accent-blue);border-radius:2px;transition:width .15s ease;`;
-const KGrid         = styled.div`display:grid;grid-template-columns:repeat(3,1fr);gap:7px;width:min(340px,100%);`;
-const KBtn          = styled.button<{$action?:boolean;$confirm?:boolean}>`height:54px;border-radius:var(--radius-md);font-size:${({$action})=>$action?'var(--font-size-xs)':'var(--font-size-xl)'};font-weight:${({$confirm})=>$confirm?700:500};border:1.5px solid ${({$confirm})=>$confirm?'var(--accent-blue)':'var(--border-default)'};background-color:${({$confirm,$action})=>$confirm?'var(--accent-blue)':$action?'var(--bg-card)':'var(--bg-button)'};color:var(--text-primary);transition:all var(--transition);&:hover:not(:disabled){background-color:${({$confirm})=>$confirm?'#3A7BC8':'var(--bg-button-hover)'};border-color:var(--accent-blue);}&:active:not(:disabled){transform:scale(0.96);}&:disabled{opacity:0.4;cursor:not-allowed;}&:focus-visible{outline:3px solid var(--border-focus);outline-offset:2px;}`;
-const InputFeedback = styled.p`font-size:var(--font-size-xs);color:var(--text-muted);text-align:center;`;
-const FPSection     = styled.div`display:flex;flex-direction:column;align-items:center;gap:18px;`;
-const SMsg          = styled.p<{$s:string}>`font-size:var(--font-size-base);font-weight:600;text-align:center;padding:12px 20px;border-radius:var(--radius-md);color:${({$s})=>$s==='success'?'var(--accent-green)':$s==='failed'?'var(--accent-red)':'var(--text-primary)'};background-color:${({$s})=>$s==='success'?'rgba(39,174,96,0.12)':$s==='failed'?'rgba(231,76,60,0.12)':$s==='scanning'?'rgba(74,144,217,0.12)':'var(--bg-card)'};border:1.5px solid ${({$s})=>$s==='success'?'var(--accent-green)':$s==='failed'?'var(--accent-red)':$s==='scanning'?'var(--accent-blue)':'var(--border-default)'};`;
-const ScanArea      = styled.div<{$s:string}>`position:relative;width:130px;height:130px;border-radius:50%;border:2px solid ${({$s})=>$s==='success'?'var(--accent-green)':$s==='failed'?'var(--accent-red)':$s==='scanning'?'var(--accent-blue)':'var(--border-default)'};background-color:${({$s})=>$s==='success'?'rgba(39,174,96,0.1)':$s==='failed'?'rgba(231,76,60,0.1)':'var(--bg-card)'};display:flex;align-items:center;justify-content:center;cursor:${({$s})=>$s==='idle'||$s==='failed'?'pointer':'default'};transition:all var(--transition);&:hover{border-color:var(--accent-blue);}&:focus-visible{outline:3px solid var(--border-focus);outline-offset:4px;}`;
-const Ri            = styled.span<{$c:string}>`font-size:52px;color:${({$c})=>$c};line-height:1;`;
-const Ring          = styled.div<{$d:string}>`position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent-blue);animation:${ripple} 1.5s ease-out ${({$d})=>$d} infinite;`;
-const RetryBtn      = styled.button`padding:11px 26px;border-radius:var(--radius-md);border:1.5px solid var(--accent-blue);background-color:transparent;color:var(--text-primary);font-size:var(--font-size-base);font-weight:600;transition:all var(--transition);&:hover{background-color:rgba(74,144,217,0.1);}&:focus-visible{outline:3px solid var(--border-focus);outline-offset:2px;}`;
-const RHint         = styled.span`font-size:11px;color:var(--text-muted);font-weight:400;`;
-const SimNote       = styled.p`font-size:11px;color:var(--text-muted);text-align:center;`;
+const PageWrapper   = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-lg);
+    height: 100%;
+`;
+
+const Badge = styled.div`
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    background-color: rgba(125, 205, 255, 0.12);
+    border: 1px solid var(--accent-blue);
+    color: var(--text-primary);
+    font-size: var(--font-size-xs);
+    align-self: stretch;
+    text-align: center;
+    strong { font-weight: 700; }
+`;
+
+const KSection = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-lg);
+    width: 100%;
+`;
+
+const Display = styled.div`
+    width: min(560px, 100%);
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-sm);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--accent-blue);
+    background-color: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+`;
+
+const PHint = styled.span`
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    opacity: 0.6;
+`;
+
+const DText = styled.span`
+    color: #ffffff;
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    letter-spacing: 4px;
+`;
+
+const PBar  = styled.div`width:100%;height:4px;background-color:var(--border-default);border-radius:2px;overflow:hidden;`;
+const PFill = styled.div<{$w:number}>`height:100%;width:${({$w})=>$w}%;background-color:var(--accent-blue);border-radius:2px;transition:width .15s ease;`;
+
+const KGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    width: min(560px, 100%);
+`;
+
+const KBtn = styled.button<{$action?:boolean;$confirm?:boolean}>`
+    height: 120px;
+    border-radius: var(--radius-md);
+    font-size: ${({$action}) => $action ? 'var(--font-size-sm)' : 'var(--font-size-xl)'};
+    font-weight: ${({$confirm}) => $confirm ? 700 : 500};
+    border: 2px solid ${({$confirm}) => $confirm ? 'var(--accent-blue)' : 'var(--border-default)'};
+    background-color: ${({$confirm,$action}) =>
+        $confirm ? 'var(--accent-blue)' : $action ? 'var(--bg-secondary)' : 'var(--bg-card)'};
+    color: ${({$confirm}) => $confirm ? '#000000' : '#ffffff'};
+    transition: all var(--transition);
+    &:hover:not(:disabled) { filter: brightness(1.1); border-color: var(--accent-blue); }
+    &:active:not(:disabled) { transform: scale(0.96); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+    &:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 2px; }
+`;
+
+const InputFeedback = styled.p`
+    font-size: var(--font-size-xs);
+    color: var(--text-primary);
+    text-align: center;
+`;
+
+const FPSection = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-lg);
+`;
+
+const SMsg = styled.p<{$s:string}>`
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    text-align: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    color: ${({$s}) => $s==='success' ? 'var(--accent-green)' : $s==='failed' ? 'var(--accent-red)' : 'var(--text-primary)'};
+    background-color: ${({$s}) =>
+        $s==='success' ? 'rgba(39,174,96,0.12)' :
+        $s==='failed'  ? 'rgba(231,76,60,0.12)'  :
+        $s==='scanning'? 'rgba(125,205,255,0.12)' : 'var(--bg-default)'};
+    border: 2px solid ${({$s}) =>
+        $s==='success' ? 'var(--accent-green)' :
+        $s==='failed'  ? 'var(--accent-red)'   :
+        $s==='scanning'? 'var(--accent-blue)'  : 'var(--border-default)'};
+`;
+
+const ScanArea = styled.div<{$s:string}>`
+    position: relative;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 3px solid ${({$s}) =>
+        $s==='success' ? 'var(--accent-green)' :
+        $s==='failed'  ? 'var(--accent-red)'   :
+        $s==='scanning'? 'var(--accent-blue)'  : 'var(--border-default)'};
+    background-color: ${({$s}) =>
+        $s==='success' ? 'rgba(39,174,96,0.1)' :
+        $s==='failed'  ? 'rgba(231,76,60,0.1)' : 'var(--bg-secondary)'};
+    display: flex; align-items: center; justify-content: center;
+    cursor: ${({$s}) => $s==='idle'||$s==='failed' ? 'pointer' : 'default'};
+    transition: all var(--transition);
+    &:hover { border-color: var(--accent-blue); }
+    &:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 4px; }
+`;
+
+const Ri    = styled.span<{$c:string}>`font-size: 80px; color:${({$c})=>$c}; line-height:1;`;
+const Ring  = styled.div<{$d:string}>`position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent-blue);animation:${ripple} 1.5s ease-out ${({$d})=>$d} infinite;`;
+
+const RetryBtn = styled.button`
+    min-height: var(--touch-min);
+    padding: 0 var(--spacing-xl);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--accent-blue);
+    background-color: transparent;
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    transition: all var(--transition);
+    &:hover { background-color: rgba(125,205,255,0.1); }
+    &:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 2px; }
+`;
+
+const RHint   = styled.span`font-size: var(--font-size-xs); color: var(--text-primary); opacity: 0.6; font-weight: 400;`;
+const SimNote = styled.p`font-size: var(--font-size-xs); color: var(--text-primary); opacity: 0.5; text-align: center;`;

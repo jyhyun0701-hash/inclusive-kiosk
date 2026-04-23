@@ -12,9 +12,6 @@ import imgEn from "../assets/images/en.png";
 import imgJp from "../assets/images/jp.png";
 import imgCn from "../assets/images/cn.png";
 
-// ─────────────────────────────────────────────
-// 언어 설정
-// ─────────────────────────────────────────────
 const TITLES: Record<string, string> = {
 	ko: "이용하실 언어와 메뉴를 선택해주십시오.",
 	en: "Please select your language and menu.",
@@ -36,9 +33,6 @@ const LANGUAGES = [
     { code: "zh", label: "中文",   img: imgCn },
 ] as const;
 
-// ─────────────────────────────────────────────
-// MainPage
-// ─────────────────────────────────────────────
 const MainPage = () => {
 	const navigate = useNavigate();
 	const { language, setLanguage, ttsEnabled, zoomEnabled } = useAccessibility();
@@ -79,7 +73,7 @@ const MainPage = () => {
 
 	// ─────────────────────────────────────────
 	return (
-		<Layout currentStep={1}>
+		<Layout currentStep={1} title={TITLES[language]}>
 			<PageWrapper>
 
 				{/* ── 상단 스크롤 화살표 (줌 모드) ── */}
@@ -96,9 +90,6 @@ const MainPage = () => {
 						</NavArrowBtn>
 					</NavUpRow>
 				)}
-
-				{/* ── 타이틀 ── */}
-				<Title aria-live="polite">{TITLES[language]}</Title>
 
 				{/* ── 자주 찾는 증명서 ── */}
 				<ContentRow>
@@ -214,23 +205,12 @@ const PageWrapper = styled.div`
 	flex-direction: column;
 	gap: var(--spacing-lg);
 	height: 100%;
-	padding: var(--spacing-lg) var(--spacing-xl);
-`;
-
-// ── 타이틀 ──
-const Title = styled.h1`
-	font-size: var(--font-size-xl);
-	font-weight: 700;
-	color: var(--text-primary);
-	text-align: center;
-	line-height: 1.4;
 `;
 
 // ── 줌 네비게이션 ──
 const NavUpRow = styled.div`
 	display: flex;
 	justify-content: center;
-	margin-bottom: calc(var(--spacing-md) * -1);
 `;
 
 const NavArrowBtn = styled.button`
@@ -246,7 +226,7 @@ const NavArrowBtn = styled.button`
 	align-items: center;
 	justify-content: center;
 	transition: all var(--transition);
-	&:hover { background-color: #e09520; }
+	&:hover { filter: brightness(0.9); }
 	&:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 2px; }
 `;
 
@@ -271,7 +251,7 @@ const SideNavBtn = styled.button`
 	align-items: center;
 	justify-content: center;
 	transition: all var(--transition);
-	&:hover { background-color: #e09520; }
+	&:hover { filter: brightness(0.9); }
 	&:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 2px; }
 `;
 
@@ -290,40 +270,40 @@ const SLabel = styled.p`
 	justify-content: center;
 	gap: var(--spacing-sm);
 	font-size: var(--font-size-base);
-	font-weight: 900;
+	font-weight: 700;
 	color: var(--text-primary);
 `;
 
 const Star = styled.span`
 	color: var(--accent-yellow);
-	font-size: var(--font-size-base);
+	font-size: var(--font-size-lg);
 `;
 
 const CardList = styled.ul`
 	list-style: none;
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-xl);
+	gap: var(--spacing-lg);
 `;
 
 const CertCard = styled.button`
 	position: relative;
 	width: 100%;
-	min-height: 140px;         /* 88px → 140px */
+	min-height: 140px;
 	padding: var(--spacing-lg) var(--spacing-xl);
 	background-color: var(--accent-blue);
 	border: 2px solid transparent;
 	border-radius: var(--radius-md);
 	color: var(--text-primary);
 	font-size: var(--font-size-base);
-	font-weight: 1000;
+	font-weight: 700;
 	text-align: center;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	transition: all var(--transition);
 	&:hover {
-		background-color: #3a7bc8;
+		filter: brightness(0.92);
 		transform: translateY(-2px);
 	}
 	&:focus-visible {
@@ -343,22 +323,20 @@ const CardStarMark = styled.span`
 
 const MoreBtn = styled.button`
 	width: 100%;
-	min-height: 140px;         /* 88px → 140px */
+	min-height: 140px;
     padding: var(--spacing-lg) var(--spacing-xl);
 	border-radius: var(--radius-md);
  	border: none;
 	background-color: var(--bg-default);
 	color: var(--text-primary);
 	font-size: var(--font-size-base);
-	font-weight: 1000;
+	font-weight: 700;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	transition: all var(--transition);
 	&:hover {
-		border-color: var(--accent-blue);
-		color: var(--text-primary);
-		background-color: var(--bg-button-hover);
+		filter: brightness(0.92);
 	}
 	&:focus-visible {
 		outline: 3px solid var(--border-focus);
@@ -381,7 +359,7 @@ const LangRow = styled.div`
 
 const LangBtn = styled.button<{ $isActive?: boolean }>`
 	width: 200px;
-	height: 180px;
+	height: 200px;
 	border-radius: 50%;
 	border: 3px solid ${({ $isActive }) =>
 		$isActive ? "var(--accent-blue)" : "var(--border-default)"};
@@ -395,10 +373,9 @@ const LangBtn = styled.button<{ $isActive?: boolean }>`
 	gap: var(--spacing-xs);
 	transition: all var(--transition);
 	box-shadow: ${({ $isActive }) =>
-		$isActive ? "0 0 0 4px rgba(74, 144, 217, 0.3)" : "none"};
+		$isActive ? "0 0 0 4px rgba(125,205,255,0.3)" : "none"};
 	&:hover {
 		border-color: var(--accent-blue);
-		background-color: var(--bg-button-hover);
 	}
 	&:focus-visible {
 		outline: 3px solid var(--border-focus);
@@ -415,11 +392,11 @@ const LangFlagImg = styled.img`
 
 const LangLabel = styled.span`
 	font-size: var(--font-size-base);
-	font-weight: 1000;
+	font-weight: 700;
 `;
 
 const LoadText = styled.p`
-	color: var(--text-secondary);
+	color: var(--text-primary);
 	text-align: center;
 	padding: var(--spacing-lg) 0;
 	font-size: var(--font-size-base);

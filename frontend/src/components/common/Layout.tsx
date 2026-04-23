@@ -7,11 +7,12 @@ import { useKeypadContext } from '../../App';
 
 interface LayoutProps {
   currentStep: 1 | 2 | 3 | 4;
+  title: string;
   children: ReactNode;
   modal?: ReactNode;
 }
 
-const Layout = ({ currentStep, children, modal }: LayoutProps) => {
+const Layout = ({ currentStep, title, children, modal }: LayoutProps) => {
   const location = useLocation();
   const { isKeypadOpen, toggleKeypad } = useKeypadContext();
   const showHomeButton = location.pathname !== '/';
@@ -19,23 +20,17 @@ const Layout = ({ currentStep, children, modal }: LayoutProps) => {
   return (
     <Screen>
       {/* Breadcrumb — 고정 높이 */}
-      <Breadcrumb currentStep={currentStep} />
+      <Breadcrumb currentStep={currentStep} title={title}/>
 
-      {/*
-       * Main — flex:1 + min-height:0 필수
-       * overflow-y:auto → 콘텐츠가 넘치면 스크롤
-       * overflow-x:hidden → 가로 스크롤 방지
-       */}
       <Main role="main">{children}</Main>
 
-      {/* BottomBar — 고정 높이 */}
       <BottomBar
         showHomeButton={showHomeButton}
         onKeypadToggle={toggleKeypad}
         isKeypadOpen={isKeypadOpen}
       />
 
-      {/* 팝업 슬롯 — position:absolute로 Screen 위에 렌더 */}
+      {/* 팝업 슬롯 스크린 기준 absolute */}
       {modal}
     </Screen>
   );
@@ -49,15 +44,15 @@ const Screen = styled.div`
   display: flex;
   flex-direction: column;
   background-color: var(--bg-primary);
-  position: relative; /* 팝업(absolute) 기준점 */
-  /* overflow:hidden 제거 — 자식 Main이 스크롤 처리 */
+  position: relative;
 `;
 
 const Main = styled.main`
   flex: 1;
-  min-height: 0;       /* flex 자식의 overflow 허용을 위해 필수 */
-  overflow: hidden;
-  padding: 16px 20px;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--spacing-lg) var(--spacing-xl);
 
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
