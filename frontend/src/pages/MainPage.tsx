@@ -1,403 +1,122 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import Layout from "../components/common/Layout";
-import { useAccessibility } from "../context/AccessibilityContext";
-import { useFocusManagerContext } from "../context/FocusManagerContext";
-import { fetchCertificates } from "../api/certificateApi";
-import type { Certificate } from "../types/certificate";
-import { FAVORITE_CERTIFICATE_NAMES } from "../types/certificate";
+import React, { useState } from 'react';
+import StepIndicator from '../components/common/StepIndicator';
+import BottomBar from '../components/common/BottomBar';
+import InfoModal from '../components/common/InfoModal';
+import { type Language, QUICK_CERTIFICATES } from '../types/kiosk';
 import imgKr from "../assets/images/kr.png";
 import imgEn from "../assets/images/en.png";
 import imgJp from "../assets/images/jp.png";
 import imgCn from "../assets/images/cn.png";
 
-const TITLES: Record<string, string> = {
-	ko: "이용하실 언어와 메뉴를 선택해주십시오.",
-	en: "Please select your language and menu.",
-	ja: "言語とメニューを選択してください。",
-	zh: "请选择您的语言和菜单。",
+interface MainPageProps {
+  language: Language;
+  isTtsOn: boolean;
+  isMagnified: boolean;
+  onLanguageChange: (lang: Language) => void;
+  onCertificateSelect: (certId: string) => void;
+  onMoreCertificates: () => void;
+  onToggleTts: () => void;
+  onToggleMagnify: () => void;
+}
+
+const LANG_LIST: { code: Language; label: string; flag: string }[] = [
+  { code: "ko", label: "한국어", img: imgKr },
+  { code: "en", label: "English", img: imgEn },
+  { code: "ja", label: "日本語", img: imgJp },
+  { code: "zh", label: "中文",   img: imgCn },
+];
+
+const HEADER: Record<Language, string> = {
+  ko: '이용하실 언어와 메뉴를 선택해주십시오.',
+  en: 'Please select your language and menu.',
+  ja: 'ご利用の言語とメニューをお選びください。',
+  zh: '请选择使用语言和菜单。',
+};
+const QUICK_LABEL: Record<Language, string> = {
+  ko: '자주 찾는 증명서', en: 'Frequently Used', ja: 'よく使う証明書', zh: '常用证明书',
+};
+const MORE_LABEL: Record<Language, string> = {
+  ko: '증명서 더보기', en: 'More Documents', ja: '証明書一覧', zh: '查看更多',
 };
 
-const MORE: Record<string, string> = {
-	ko: "증명서 더보기",
-	en: "View All",
-	ja: "もっと見る",
-	zh: "查看更多",
-};
+const MainPage: React.FC<MainPageProps> = ({
+  language, isTtsOn, isMagnified,
+  onLanguageChange, onCertificateSelect, onMoreCertificates,
+  onToggleTts, onToggleMagnify,
+}) => {
+  const [showInfo, setShowInfo] = useState(false);
 
-const LANGUAGES = [
-	{ code: "ko", label: "한국어", img: imgKr },
-	{ code: "en", label: "English", img: imgEn },
-    { code: "ja", label: "日本語", img: imgJp },
-    { code: "zh", label: "中文",   img: imgCn },
-] as const;
+  return (
+    <div className="kiosk-root">
+      <header className="kiosk-header">
+        <StepIndicator currentStep={1} language={language} />
+        <div className="header-title">{HEADER[language]}</div>
+      </header>
 
-const MainPage = () => {
-	const navigate = useNavigate();
-	const { language, setLanguage, ttsEnabled, zoomEnabled } = useAccessibility();
-	const fm = useFocusManagerContext();
+      {isMagnified && (
+        <>
+          <button className="nav-arrow left" aria-label="왼쪽">‹</button>
+          <button className="nav-arrow right" aria-label="오른쪽">›</button>
+        </>
+      )}
 
-	const [allCerts, setAllCerts]   = useState<Certificate[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
+      <main className="kiosk-content">
+        <div className="section-title">
+          <span className="star">★</span>
+          <span>{QUICK_LABEL[language]}</span>
+        </div>
 
-	// ── 초기화 ──
-	useEffect(() => {
-		fm.initTabGroup(document, "main", { tabRotation: true, playTtsOnMoved: true });
-		fm.initTabGroup(document, "bottombar", { tabRotation: true, playTtsOnMoved: true });
-		fm.registerGroupChain("main",     { next: "bottombar", prev: "bottombar" });
-		fm.registerGroupChain("bottombar",{ next: "main",      prev: "main"      });
+        <div className="cert-list">
+          {QUICK_CERTIFICATES.map((cert) => (
+            <button
+              key={cert.id}
+              className="cert-btn"
+              onClick={() => onCertificateSelect(cert.id)}
+              aria-label={cert.nameKo}
+            >
+              {language === 'ko' ? cert.nameKo : (cert.nameEn ?? cert.nameKo)}
+            </button>
+          ))}
+          <button
+            className="cert-btn gray"
+            onClick={onMoreCertificates}
+            aria-label={MORE_LABEL[language]}
+          >
+            {MORE_LABEL[language]}
+          </button>
+        </div>
+      </main>
 
-		fetchCertificates()
-			.then(setAllCerts)
-			.catch(console.error)
-			.finally(() => setIsLoading(false));
-	}, []);
+      <div className="lang-selector">
+                {LANG_LIST.map((l) => (
+                  <button
+                    key={l.code}
+                    className={`lang-btn${language === l.code ? ' active' : ''}`}
+                    onClick={() => onLanguageChange(l.code)}
+                    aria-label={l.label}
+                    aria-pressed={language === l.code}
+                  >
+                    <span className="flag">
+                     <img src={l.img} alt={`${l.label} flag`} />
+                    </span>
+                    <span>{l.label}</span>
+                  </button>
+                ))}
+      </div>
 
-	// ── 로드 완료 후 포커스 재설정 ──
-	useEffect(() => {
-		if (isLoading || !ttsEnabled) return;
-		fm.activateFocusMode("main", 0, document);
-	}, [isLoading]);
+      {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
 
-	const favCerts = allCerts.filter((c) =>
-		FAVORITE_CERTIFICATE_NAMES.includes(c.nameKo),
-	);
-
-	// ─────────────────────────────────────────
-	// 줌 모드 네비게이션 핸들러
-	// ─────────────────────────────────────────
-	const handleScrollUp    = () => window.scrollBy({ top: -300, behavior: "smooth" });
-	const handleScrollLeft  = () => window.scrollBy({ left: -300, behavior: "smooth" });
-	const handleScrollRight = () => window.scrollBy({ left:  300, behavior: "smooth" });
-
-	// ─────────────────────────────────────────
-	return (
-		<Layout currentStep={1} title={TITLES[language]}>
-			<PageWrapper>
-
-				{/* ── 상단 스크롤 화살표 (줌 모드) ── */}
-				{zoomEnabled && (
-					<NavUpRow>
-						<NavArrowBtn
-							onClick={handleScrollUp}
-							aria-label="위로 스크롤"
-							data-tabfocus="Y"
-							data-tabgroup="main"
-							tabIndex={-1}
-						>
-							∧
-						</NavArrowBtn>
-					</NavUpRow>
-				)}
-
-				{/* ── 자주 찾는 증명서 ── */}
-				<ContentRow>
-					{/* 좌측 화살표 (줌 모드) */}
-					{zoomEnabled && (
-						<SideNavBtn
-							onClick={handleScrollLeft}
-							aria-label="왼쪽으로 스크롤"
-							data-tabfocus="Y"
-							data-tabgroup="main"
-							tabIndex={-1}
-						>
-							‹
-						</SideNavBtn>
-					)}
-
-					<Section>
-						<SLabel>
-							<Star aria-hidden="true">★</Star>
-							자주 찾는 증명서
-						</SLabel>
-
-						{isLoading ? (
-							<LoadText role="status">불러오는 중...</LoadText>
-						) : (
-							<CardList role="list">
-								{favCerts.map((cert, idx) => (
-									<li key={cert.id}>
-										<CertCard
-											onClick={() =>
-												navigate("/certificate", {
-													state: { selectedCertificate: cert },
-												})
-											}
-											data-tabfocus="Y"
-											data-tabgroup="main"
-											tabIndex={idx}
-											data-ttsmsg={`${cert.nameKo}. 선택하려면 확인을 누르세요.`}
-											aria-label={cert.nameKo}
-										>
-											<CardStarMark aria-hidden="true">★</CardStarMark>
-											{cert.nameKo}
-										</CertCard>
-									</li>
-								))}
-							</CardList>
-						)}
-
-						<MoreBtn
-							onClick={() => navigate("/certificate")}
-							data-tabfocus="Y"
-							data-tabgroup="main"
-							tabIndex={favCerts.length}
-							data-ttsmsg={`${MORE[language]}. 전체 증명서 목록으로 이동합니다.`}
-							aria-label={MORE[language]}
-						>
-							{MORE[language]}
-						</MoreBtn>
-					</Section>
-
-					{/* 우측 화살표 (줌 모드) */}
-					{zoomEnabled && (
-						<SideNavBtn
-							onClick={handleScrollRight}
-							aria-label="오른쪽으로 스크롤"
-							data-tabfocus="Y"
-							data-tabgroup="main"
-							tabIndex={-1}
-						>
-							›
-						</SideNavBtn>
-					)}
-				</ContentRow>
-
-				{/* ── 언어 선택 ── */}
-                <LangSection>
-                    <LangRow role="group" aria-label="언어 선택">
-                        {LANGUAGES.map((lang, idx) => {
-                            const isActive = language === lang.code;
-                            return (
-                                <LangBtn
-                                    key={lang.code}
-                                    onClick={() => setLanguage(lang.code)}
-                                    $isActive={isActive}
-                                    data-tabfocus="Y"
-                                    data-tabgroup="main"
-                                    tabIndex={favCerts.length + 1 + idx}
-                                    data-ttsmsg={`${lang.label} 선택.`}
-                                    aria-label={lang.label}
-                                    aria-pressed={isActive}
-                                >
-                                    <LangFlagImg src={lang.img} alt={lang.label} />
-                                    <LangLabel>{lang.label}</LangLabel>
-                                </LangBtn>
-                            );
-                        })}
-                    </LangRow>
-                </LangSection>
-
-			</PageWrapper>
-		</Layout>
-	);
+      <BottomBar
+        language={language}
+        isTtsOn={isTtsOn}
+        isMagnified={isMagnified}
+        onHome={() => {}}
+        onInfo={() => setShowInfo(true)}
+        onToggleTts={onToggleTts}
+        onToggleMagnify={onToggleMagnify}
+      />
+    </div>
+  );
 };
 
 export default MainPage;
-
-// ═══════════════════════════════════════════════
-// Styled Components
-// ═══════════════════════════════════════════════
-
-const PageWrapper = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-lg);
-	height: 100%;
-`;
-
-// ── 줌 네비게이션 ──
-const NavUpRow = styled.div`
-	display: flex;
-	justify-content: center;
-`;
-
-const NavArrowBtn = styled.button`
-	width: 72px;
-	height: 72px;
-	border-radius: var(--radius-md);
-	border: none;
-	background-color: var(--accent-yellow);
-	color: #1b2b5e;
-	font-size: 36px;
-	font-weight: 700;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: all var(--transition);
-	&:hover { filter: brightness(0.9); }
-	&:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 2px; }
-`;
-
-const ContentRow = styled.div`
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-sm);
-	flex: 1;
-`;
-
-const SideNavBtn = styled.button`
-	flex-shrink: 0;
-	width: 72px;
-	height: 72px;
-	border-radius: var(--radius-md);
-	border: none;
-	background-color: var(--accent-yellow);
-	color: #1b2b5e;
-	font-size: 48px;
-	font-weight: 700;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: all var(--transition);
-	&:hover { filter: brightness(0.9); }
-	&:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 2px; }
-`;
-
-// ── 증명서 섹션 ──
-const Section = styled.section`
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-xl);
-`;
-
-// 자주 찾는 증명서
-const SLabel = styled.p`
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: var(--spacing-sm);
-	font-size: var(--font-size-base);
-	font-weight: 700;
-	color: var(--text-primary);
-`;
-
-const Star = styled.span`
-	color: var(--accent-yellow);
-	font-size: var(--font-size-lg);
-`;
-
-const CardList = styled.ul`
-	list-style: none;
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-lg);
-`;
-
-const CertCard = styled.button`
-	position: relative;
-	width: 100%;
-	min-height: 140px;
-	padding: var(--spacing-lg) var(--spacing-xl);
-	background-color: var(--accent-blue);
-	border: 2px solid transparent;
-	border-radius: var(--radius-md);
-	color: var(--text-primary);
-	font-size: var(--font-size-base);
-	font-weight: 700;
-	text-align: center;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: all var(--transition);
-	&:hover {
-		filter: brightness(0.92);
-		transform: translateY(-2px);
-	}
-	&:focus-visible {
-		outline: 3px solid var(--border-focus);
-		outline-offset: 2px;
-	}
-`;
-
-const CardStarMark = styled.span`
-	position: absolute;
-	left: var(--spacing-md);
-	top: 50%;
-	transform: translateY(-50%);
-	color: var(--accent-yellow);
-	font-size: var(--font-size-base);
-`;
-
-const MoreBtn = styled.button`
-	width: 100%;
-	min-height: 140px;
-    padding: var(--spacing-lg) var(--spacing-xl);
-	border-radius: var(--radius-md);
- 	border: none;
-	background-color: var(--bg-default);
-	color: var(--text-primary);
-	font-size: var(--font-size-base);
-	font-weight: 700;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: all var(--transition);
-	&:hover {
-		filter: brightness(0.92);
-	}
-	&:focus-visible {
-		outline: 3px solid var(--border-focus);
-		outline-offset: 2px;
-	}
-`;
-
-// ── 언어 선택 ──
-const LangSection = styled.div`
-	margin-top: auto;
-	padding-bottom: var(--spacing-sm);
-`;
-
-const LangRow = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: var(--spacing-xl);
-`;
-
-const LangBtn = styled.button<{ $isActive?: boolean }>`
-	width: 200px;
-	height: 200px;
-	border-radius: 50%;
-	border: 3px solid ${({ $isActive }) =>
-		$isActive ? "var(--accent-blue)" : "var(--border-default)"};
-	background-color: ${({ $isActive }) =>
-		$isActive ? "var(--bg-blue)" : "var(--bg-card)"};
-	color: var(--text-secondary);
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: var(--spacing-xs);
-	transition: all var(--transition);
-	box-shadow: ${({ $isActive }) =>
-		$isActive ? "0 0 0 4px rgba(125,205,255,0.3)" : "none"};
-	&:hover {
-		border-color: var(--accent-blue);
-	}
-	&:focus-visible {
-		outline: 3px solid var(--border-focus);
-		outline-offset: 2px;
-	}
-`;
-
-const LangFlagImg = styled.img`
-	width: 80px;
-    height: 80px;
-    object-fit: cover;
-    flex-shrink: 0;
-`;
-
-const LangLabel = styled.span`
-	font-size: var(--font-size-base);
-	font-weight: 700;
-`;
-
-const LoadText = styled.p`
-	color: var(--text-primary);
-	text-align: center;
-	padding: var(--spacing-lg) 0;
-	font-size: var(--font-size-base);
-`;

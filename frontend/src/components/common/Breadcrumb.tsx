@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 interface BreadcrumbProps {
 	currentStep: 1 | 2 | 3 | 4;
+	title?: string;
 }
 
 const STEPS = [

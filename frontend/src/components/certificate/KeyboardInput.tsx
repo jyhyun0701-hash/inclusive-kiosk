@@ -16,7 +16,7 @@ const KO_ROWS = [
   ['ㅋ','ㅌ','ㅊ','ㅍ','ㅠ','ㅜ','ㅡ'],
 ];
 
-const KeyboardInput = ({ value, onChange, placeholder = '증명서명을 입력하세요' }: KeyboardInputProps) => {
+const KeyboardInput = ({ value: _value, onChange, placeholder = '증명서명을 입력하세요' }: KeyboardInputProps) => {
   // 한글 조합 상태는 내부에서만 관리
   const [hangulState, setHangulState] = useState<HangulState>(HANGUL_INITIAL);
 
