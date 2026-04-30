@@ -11,7 +11,7 @@
    ────────────────────────────────────────────── */
 :root {
   /* 팔레트 */
-  --navy:        #0D2461;
+  --navy:        #0F2A44;
   --navy-light:  #1a3a7c;
   --blue-light:  #C8E9F8;
   --blue-btn:    #7DCDFF;
@@ -538,32 +538,42 @@ html, body {
    12. 3. 본인 확인 — 주민번호 입력
    ────────────────────────────────────────────── */
 .id-display {
-  background: #f0f0f0;
-  border: 3px solid #ccc;
+  background: var(--gray-mid);
   border-radius: var(--r);
   padding: 36px 44px;
   font-size: 52px;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 44px;
+  max-width: 720px;
+  margin: 0 auto 44px;
   min-height: 120px;
   display: flex;
   align-items: center;
   letter-spacing: 5px;
+  box-sizing: border-box; /* 패딩이 너비에 영향을 주지 않도록 설정 */
 }
-.id-display.empty { color: #aaa; font-size: 38px; letter-spacing: 0; font-weight: 400; }
+.id-display.empty {
+  color: var(--text);
+  font-size: 38px;
+  letter-spacing: 0;
+  font-weight: 500;
+  line-height: 1.4;
+  }
 
 .numpad-wrap {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
+  gap: 45px;
   max-width: 720px;
   margin: 0 auto;
 }
 .num-key {
-  height: 152px;
+  height: 130px;
   background: var(--navy);
   color: var(--white);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.1s ease; /* 변화를 부드럽게 */
   border: none;
   border-radius: var(--r);
   font-family: inherit;
@@ -574,11 +584,11 @@ html, body {
   transition: background 0.1s;
   outline: none;
 }
-.num-key:hover  { background: var(--navy-light); }
+
 .num-key:active { background: var(--orange); }
 .num-key:focus-visible { outline: 4px solid var(--yellow); }
-.num-key.del    { background: #555; font-size: 36px; font-weight: 700; }
-.num-key.confirm { background: var(--orange); font-size: 38px; }
+.num-key.del    { background: var(--gray-mid); color: var(--text); font-size: 36px; font-weight: 700; }
+.num-key.confirm { background: var(--gray-mid); color: var(--text); font-size: 38px; }
 
 /* ──────────────────────────────────────────────
    13. 상태 카드

@@ -85,7 +85,15 @@ const IdentityVerificationPage: React.FC<Props> = ({
           <>
             {/* 입력값 표시 */}
             <div className={`id-display${!id ? ' empty' : ''}`}>
-              {id ? formatId(id) : '주민번호를 입력하십시오. 예) 901010-1234567'}
+              {id ? (
+                  formatId(id)
+                ) : (
+                  <>
+                    주민번호를 입력하십시오.
+                    <br />
+                    예) 901010-1234567
+                  </>
+                )}
             </div>
             <NumPad
               value={id}
