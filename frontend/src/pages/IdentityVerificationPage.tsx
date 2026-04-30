@@ -80,7 +80,7 @@ const IdentityVerificationPage: React.FC<Props> = ({
         <div className="header-title">{HEADER[step][language]}</div>
       </header>
 
-      <main className="kiosk-content">
+      <main className="kiosk-content content-verify">
         {step === 'id-input' && (
           <>
             {/* 입력값 표시 */}
@@ -89,9 +89,7 @@ const IdentityVerificationPage: React.FC<Props> = ({
                   formatId(id)
                 ) : (
                   <>
-                    주민번호를 입력하십시오.
-                    <br />
-                    예) 901010-1234567
+                    주민번호를 입력하십시오. 예) 901010-1234567
                   </>
                 )}
             </div>

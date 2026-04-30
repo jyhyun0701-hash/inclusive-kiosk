@@ -20,7 +20,7 @@ interface BottomBarProps {
 const LABELS: Record<Language, { home: string; info: string; ttsOn: string; ttsOff: string; magnify: string }> = {
   ko: { home: '처음으로', info: '이용 안내', ttsOn: '음성 켜기', ttsOff: '음성 끄기', magnify: '화면확대' },
   en: { home: 'Home', info: 'Guide', ttsOn: 'TTS ON', ttsOff: 'TTS OFF', magnify: 'Zoom' },
-  ja: { home: '最初へ', info: '案内', ttsOn: '音声ON', ttsOff: '音声OFF', magnify: '画面拡大' },
+  ja: { home: '最初へ', info: '案内', ttsOn: '音声ON', ttsOff: '音声', magnify: '画面拡大' },
   zh: { home: '首页', info: '使用指南', ttsOn: '语音开', ttsOff: '语音关', magnify: '放大' },
 };
 

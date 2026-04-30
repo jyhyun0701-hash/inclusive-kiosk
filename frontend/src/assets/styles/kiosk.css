@@ -155,9 +155,24 @@ html, body {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 150px 150px;
+  padding: 40px;
   background: var(--white);
 }
+
+.content-verify {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 상하 중앙 */
+  align-items: center;     /* 좌우 중앙 */
+}
+
+.content-verify > .id-display,
+.content-verify > .numpad-wrap,
+.content-verify > .fingerprint-area {
+  width: 100%;
+  max-width: 826px;
+}
+
 .kiosk-content::-webkit-scrollbar { width: 10px; }
 .kiosk-content::-webkit-scrollbar-thumb { background: #ccc; border-radius: 5px; }
 
@@ -228,18 +243,23 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 65px;
+  align-items: center;
+  width: 100%
 }
 
 .cert-btn {
+  max-width: 600px;
   width: 100%;
   height: 140px;
   padding: 0 44px;
   background: var(--blue-btn);
   color: var(--text);
+  box-shadow: 0 5px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.1s ease; /* 변화를 부드럽게 */
   border: 4px solid transparent;
   border-radius: var(--r);
   font-family: inherit;
-  font-size: var(--fs-btn-xl);
+  font-size: var(--fs-btn-lg );
   font-weight: 700;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -267,7 +287,7 @@ html, body {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   font-family: inherit;
-  font-size: 36px;
+  font-size: var(--fs-btn-lg);
   font-weight: 700;
   background: #2E2D2D;
   color: var(--white);
@@ -545,9 +565,8 @@ html, body {
   font-weight: 700;
   color: var(--text);
   margin-bottom: 44px;
-  max-width: 720px;
   margin: 0 auto 44px;
-  min-height: 120px;
+  min-height: 130px;
   display: flex;
   align-items: center;
   letter-spacing: 5px;
@@ -555,7 +574,7 @@ html, body {
 }
 .id-display.empty {
   color: var(--text);
-  font-size: 38px;
+  font-size: var(--fs-btn-lg);
   letter-spacing: 0;
   font-weight: 500;
   line-height: 1.4;
@@ -563,12 +582,13 @@ html, body {
 
 .numpad-wrap {
   display: grid;
+  justify-content: center;
   grid-template-columns: repeat(3, 1fr);
   gap: 45px;
-  max-width: 720px;
   margin: 0 auto;
 }
 .num-key {
+  width: 245px;
   height: 130px;
   background: var(--navy);
   color: var(--white);

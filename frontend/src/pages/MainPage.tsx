@@ -60,7 +60,7 @@ const MainPage: React.FC<MainPageProps> = ({
         </>
       )}
 
-      <main className="kiosk-content">
+      <main className="kiosk-content content-verify">
         <div className="section-title">
           <span className="star">★</span>
           <span>{QUICK_LABEL[language]}</span>
