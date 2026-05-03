@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import './assets/styles/kiosk.css';
 
 import MainPage from './pages/MainPage';
@@ -9,6 +9,7 @@ import IdentityVerificationPage from './pages/IdentityVerificationPage';
 import IssuancePage from './pages/IssuancePage';
 import VirtualKeypad, { type KeypadKey } from './components/common/VirtualKeypad';
 import { useFocusManager } from './hooks/useFocusManager';
+import { setGlobalTts} from './utils/speakSafe';
 
 import {
   type Language, type Certificate, type CertificateCategory, QUICK_CERTIFICATES,
@@ -53,12 +54,28 @@ const App: React.FC = () => {
     setScreen({ id: 'main' });
   }, []);
 
+  // 마운트 시 한 번만 그룹/체인 등록
+  useEffect(() => {
+    fm.initTabGroup(document, 'main',      { tabRotation: false, playTtsOnMoved: true });
+    fm.initTabGroup(document, 'lang',      { tabRotation: false, playTtsOnMoved: true });
+    fm.initTabGroup(document, 'bottombar', { tabRotation: false, playTtsOnMoved: true });
+
+    fm.registerGroupChain('main',      { next: 'lang' });
+    fm.registerGroupChain('lang',      { next: 'bottombar', prev: 'main' });
+    fm.registerGroupChain('bottombar', { next: 'main',      prev: 'lang' });
+  }, []);  // ← 빈 배열: 마운트 시 1회만
+
+  // handleToggleTts는 activateFocusMode만 남김
   const handleToggleTts = () => {
     const next = !isTtsOn;
     setIsTtsOn(next);
-
-    if (next) speak('접근성 모드가 활성화되었습니다.', language);
-    else window.speechSynthesis?.cancel();
+    if (next) {
+      speak('접근성 모드가 활성화되었습니다.', language);
+      setTimeout(() => fm.activateFocusMode('main', 0), 300);
+    } else {
+      fm.deactivateFocusMode();
+      window.speechSynthesis?.cancel();
+    }
   };
 
   const handleToggleMagnify = () => setIsMagnified(p => !p);

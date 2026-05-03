@@ -67,12 +67,16 @@ const MainPage: React.FC<MainPageProps> = ({
         </div>
 
         <div className="cert-list">
-          {QUICK_CERTIFICATES.map((cert) => (
+          {QUICK_CERTIFICATES.map((cert, idx) => (
             <button
               key={cert.id}
               className="cert-btn"
               onClick={() => onCertificateSelect(cert.id)}
               aria-label={cert.nameKo}
+              data-tabfocus="Y"
+              data-tabgroup="main"
+              data-ttsmsg={cert.nameKo}
+              tabIndex={idx}
             >
               {language === 'ko' ? cert.nameKo : (cert.nameEn ?? cert.nameKo)}
             </button>
@@ -81,6 +85,10 @@ const MainPage: React.FC<MainPageProps> = ({
             className="cert-btn gray"
             onClick={onMoreCertificates}
             aria-label={MORE_LABEL[language]}
+            data-tabfocus= "Y"
+            data-tabgroup="main"
+            data-ttsmsg={MORE_LABEL[language]}
+            tabIndex={QUICK_CERTIFICATES.length}
           >
             {MORE_LABEL[language]}
           </button>
@@ -88,20 +96,24 @@ const MainPage: React.FC<MainPageProps> = ({
       </main>
 
       <div className="lang-selector">
-                {LANG_LIST.map((l) => (
-                  <button
-                    key={l.code}
-                    className={`lang-btn${language === l.code ? ' active' : ''}`}
-                    onClick={() => onLanguageChange(l.code)}
-                    aria-label={l.label}
-                    aria-pressed={language === l.code}
-                  >
-                    <span className="flag">
-                     <img src={l.img} alt={`${l.label} flag`} />
-                    </span>
-                    <span>{l.label}</span>
-                  </button>
-                ))}
+        {LANG_LIST.map((l, idx) => (
+          <button
+            key={l.code}
+            className={`lang-btn${language === l.code ? ' active' : ''}`}
+            onClick={() => onLanguageChange(l.code)}
+            data-tabfocus="Y"
+            data-tabgroup="lang"
+            data-ttsmsg={l.label}
+            tabIndex={idx}
+            aria-label={l.label}
+            aria-pressed={language === l.code}
+          >
+            <span className="flag">
+             <img src={l.img} alt={`${l.label} flag`} />
+            </span>
+            <span>{l.label}</span>
+          </button>
+        ))}
       </div>
 
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
