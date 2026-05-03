@@ -20,7 +20,7 @@ interface BottomBarProps {
 const LABELS: Record<Language, { home: string; info: string; ttsOn: string; ttsOff: string; magnify: string }> = {
   ko: { home: '처음으로', info: '이용 안내', ttsOn: '음성 켜기', ttsOff: '음성 끄기', magnify: '화면확대' },
   en: { home: 'Home', info: 'Guide', ttsOn: 'TTS ON', ttsOff: 'TTS OFF', magnify: 'Zoom' },
-  ja: { home: '最初へ', info: '案内', ttsOn: '音声ON', ttsOff: '音声', magnify: '画面拡大' },
+  ja: { home: '最初へ', info: '案内', ttsOn: '音声', ttsOff: '音声', magnify: '画面拡大' },
   zh: { home: '首页', info: '使用指南', ttsOn: '语音开', ttsOff: '语音关', magnify: '放大' },
 };
 
@@ -38,6 +38,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
         onClick={onHome}
         data-tabfocus="Y"
         data-tabgroup="bottombar"
+        data-ttsmsg={l.home}
         tabIndex={0}
         aria-label={l.home}
       >
@@ -51,6 +52,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
         onClick={onInfo}
         data-tabfocus="Y"
         data-tabgroup="bottombar"
+        data-ttsmsg={l.info}
         tabIndex={1}
         aria-label={l.info}
       >
@@ -64,6 +66,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
         onClick={onToggleTts}
         data-tabfocus="Y"
         data-tabgroup="bottombar"
+        data-ttsmsg={isTtsOn ? l.ttsOff : l.ttsOn}
         tabIndex={2}
         aria-label={isTtsOn ? l.ttsOff : l.ttsOn}
         aria-pressed={isTtsOn}
@@ -78,6 +81,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
         onClick={onToggleMagnify}
         data-tabfocus="Y"
         data-tabgroup="bottombar"
+        data-ttsmsg={l.magnify}
         tabIndex={3}
         aria-label={l.magnify}
         aria-pressed={isMagnified}
