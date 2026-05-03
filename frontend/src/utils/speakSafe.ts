@@ -62,13 +62,18 @@ export const speakPriority = (msg: string) => {
  * 중복 메시지 연속 발화 방지
  */
 export const speakSafe = (msg: string) => {
-  if (!globalTtsEnabled) return;          // ← TTS 꺼진 상태 차단
+  if (!globalTtsEnabled) return;
   if (!window.speechSynthesis || !msg.trim()) return;
-  if (lastMsg === msg) return;            // ← 동일 메시지 중복 방지
+  if (lastMsg === msg) return;
 
+  // ← 이전 음성 즉시 중단 후 발화
+  window.speechSynthesis.cancel();
   lastMsg = msg;
-  if (window.speechSynthesis.paused) window.speechSynthesis.resume();
-  window.speechSynthesis.speak(makeUtt(msg));
+
+  setTimeout(() => {
+    if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+    window.speechSynthesis.speak(makeUtt(msg));
+  }, 50);
 };
 
 export const stopSpeak = () => {

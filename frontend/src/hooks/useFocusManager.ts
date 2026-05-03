@@ -2,26 +2,33 @@ import { useRef, useCallback } from 'react';
 import { speakSafe, stopSpeak } from '../utils/speakSafe';
 
 export interface FocusManager {
-  initTabGroup:         (doc: Document, group: string, opts: TabGroupOption) => void;
-  registerGroupChain:   (group: string, chain: GroupChain) => void;
-  initTabFocus:         (doc: Document, group: string, tabindex: number) => void;
-  initTabFocusWhenReady:(doc: Document, group: string, tabindex: number) => void;
-  moveTabFocusManual:   (doc: Document, group: string, tabindex: number, onMoved?: OnMovedFn) => void;
-  moveByCurrentGroup:   (direction: 'UP' | 'DOWN') => void;
-  getCurrentFocusInfo:  () => FocusInfo | null;
-  restorePrevGroup:     () => void;
-  readCurrentFocus:     () => void;
-  activateFocusMode:    (group: string, tabindex?: number, doc?: Document) => void;
-  deactivateFocusMode:  (doc?: Document) => void;
-  playTtsFromElement:   (el: HTMLElement) => void;
-  switchGroup:          (group: string, tabindex?: number) => void;
-  isActive:             () => boolean;
+  initTabGroup:          (doc: Document, group: string, opts: TabGroupOption) => void;
+  registerGroupChain:    (group: string, chain: GroupChain) => void;
+  initTabFocus:          (doc: Document, group: string, tabindex: number) => void;
+  initTabFocusWhenReady: (doc: Document, group: string, tabindex: number) => void;
+  moveTabFocusManual:    (doc: Document, group: string, tabindex: number, onMoved?: OnMovedFn) => void;
+  moveByCurrentGroup:    (direction: 'UP' | 'DOWN', onMoved?: OnMovedFn) => void;
+  getCurrentFocusInfo:   () => FocusInfo | null;
+  restorePrevGroup:      () => void;
+  readCurrentFocus:      () => void;
+  activateFocusMode:     (group: string, tabindex?: number, doc?: Document) => void;
+  deactivateFocusMode:   (doc?: Document) => void;
+  playTtsFromElement:    (el: HTMLElement) => void;
+  switchGroup:           (group: string, tabindex?: number) => void;
+  isActive:              () => boolean;
 }
 
 interface TabGroupOption { tabRotation?: boolean; playTtsOnMoved?: boolean; }
 interface GroupChain     { next?: string; prev?: string; }
 interface FocusInfo      { group: string; tabindex: number; element: HTMLElement; }
 type OnMovedFn = (info: FocusInfo) => void;
+
+// ── querySelector는 항상 소문자 tabindex 사용 (React DOM 렌더링 기준)
+const sel = (group: string, tabindex: number) =>
+  `[data-tabfocus="Y"][data-tabgroup="${group}"][tabindex="${tabindex}"]`;
+
+const selGroup = (group: string) =>
+  `[data-tabfocus="Y"][data-tabgroup="${group}"][tabindex]`;
 
 export const useFocusManager = (): FocusManager => {
   const tabGroupOptions    = useRef<Record<string, TabGroupOption>>({});
@@ -35,14 +42,14 @@ export const useFocusManager = (): FocusManager => {
       .forEach(el => el.classList.remove('focused'));
   }, []);
 
+  // tabindex 소문자로 읽기
+  const getTabindex = (el: HTMLElement) =>
+    parseInt(el.getAttribute('tabindex') ?? '0', 10);
+
   const getSortedElements = useCallback(
     (group: string, doc: Document = document): HTMLElement[] =>
-      Array.from(doc.querySelectorAll<HTMLElement>(
-        `[data-tabfocus="Y"][data-tabgroup="${group}"][tabindex]`
-      )).sort((a, b) =>
-        parseInt(a.getAttribute('tabindex') ?? '0', 10) -
-        parseInt(b.getAttribute('tabindex') ?? '0', 10)
-      ),
+      Array.from(doc.querySelectorAll<HTMLElement>(selGroup(group)))
+        .sort((a, b) => getTabindex(a) - getTabindex(b)),
     []
   );
 
@@ -51,10 +58,6 @@ export const useFocusManager = (): FocusManager => {
     if (msg) speakSafe(msg);
   }, []);
 
-  /**
-   * DOM 요소 대기 — MutationObserver + requestAnimationFrame
-   * rAF를 사용해 브라우저가 실제로 페인트한 후 요소를 탐색
-   */
   const waitForElement = useCallback(
     (selector: string, doc: Document, onFound: (el: HTMLElement) => void, timeout = 3000) => {
       const el = doc.querySelector<HTMLElement>(selector);
@@ -65,27 +68,29 @@ export const useFocusManager = (): FocusManager => {
         const found = doc.querySelector<HTMLElement>(selector);
         if (found) {
           observer.disconnect();
-          // 페인트 완료 후 실행
           requestAnimationFrame(() => requestAnimationFrame(() => onFound(found)));
         } else if (Date.now() - start > timeout) {
           observer.disconnect();
           console.warn(`[FM] waitForElement timeout: ${selector}`);
         }
       });
-      observer.observe(doc.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['tabindex', 'data-tabfocus', 'data-tabgroup'] });
+      observer.observe(doc.body, {
+        childList: true, subtree: true, attributes: true,
+        attributeFilter: ['tabindex', 'data-tabfocus', 'data-tabgroup'],
+      });
     },
     []
   );
 
   const applyFocus = useCallback(
-    (el: HTMLElement, group: string, tabindex: number, doc: Document, ttsEnabled = true) => {
+    (el: HTMLElement, group: string, tabindex: number, doc: Document) => {
       removeFocusedStyle(doc);
       el.focus();
       el.classList.add('focused');
       lastFocusedByGroup.current[group] = tabindex;
       currentGroup.current = { group, doc };
       const opts = tabGroupOptions.current[group];
-      if (ttsEnabled && opts?.playTtsOnMoved !== false) playTtsFromElement(el);
+      if (opts?.playTtsOnMoved !== false) playTtsFromElement(el);
     },
     [removeFocusedStyle, playTtsFromElement]
   );
@@ -104,10 +109,9 @@ export const useFocusManager = (): FocusManager => {
 
   const initTabFocus = useCallback(
     (doc: Document = document, group: string, tabindex: number) => {
-      const selector = `[data-tabfocus="Y"][data-tabgroup="${group}"][tabindex="${tabindex}"]`;
-      const el = doc.querySelector<HTMLElement>(selector);
+      const el = doc.querySelector<HTMLElement>(sel(group, tabindex));
       if (!el) {
-        console.warn(`[FM] initTabFocus: group="${group}" tabindex=${tabindex} not found`);
+        console.error(`[FM] initTabFocus: group="${group}" tabindex=${tabindex} not found`);
         return;
       }
       prevGroup.current = null;
@@ -118,7 +122,7 @@ export const useFocusManager = (): FocusManager => {
 
   const initTabFocusWhenReady = useCallback(
     (doc: Document = document, group: string, tabindex: number) => {
-      const selector = `[data-tabfocus="Y"][data-tabgroup="${group}"][tabindex="${tabindex}"]`;
+      const selector = sel(group, tabindex);
       const el = doc.querySelector<HTMLElement>(selector);
       if (el) {
         requestAnimationFrame(() => {
@@ -137,13 +141,13 @@ export const useFocusManager = (): FocusManager => {
 
   const moveTabFocusManual = useCallback(
     (doc: Document = document, group: string, tabindex: number, onMoved?: OnMovedFn) => {
-      const selector = `[data-tabfocus="Y"][data-tabgroup="${group}"][tabindex="${tabindex}"]`;
-      const el = doc.querySelector<HTMLElement>(selector);
+      const selector = sel(group, tabindex);
       const apply = (target: HTMLElement) => {
         prevGroup.current = currentGroup.current;
         applyFocus(target, group, tabindex, doc);
         onMoved?.({ group, tabindex, element: target });
       };
+      const el = doc.querySelector<HTMLElement>(selector);
       if (el) apply(el);
       else waitForElement(selector, doc, apply);
     },
@@ -157,9 +161,9 @@ export const useFocusManager = (): FocusManager => {
       if (targetIdx === undefined) {
         const els = getSortedElements(group, doc);
         if (els.length === 0) return;
-        targetIdx = parseInt(els[0].getAttribute('tabindex') ?? '0', 10);
+        targetIdx = getTabindex(els[0]);
       }
-      const selector = `[data-tabfocus="Y"][data-tabgroup="${group}"][tabindex="${targetIdx}"]`;
+      const selector = sel(group, targetIdx);
       const el = doc.querySelector<HTMLElement>(selector);
       const apply = (target: HTMLElement) => {
         prevGroup.current = currentGroup.current;
@@ -172,22 +176,24 @@ export const useFocusManager = (): FocusManager => {
   );
 
   const moveByCurrentGroup = useCallback(
-    (direction: 'UP' | 'DOWN') => {
-      if (!currentGroup.current) return;
+    (direction: 'UP' | 'DOWN', onMoved?: OnMovedFn) => {
+      if (!currentGroup.current) {
+        console.error('[FM] No active tabgroup.');
+        return;
+      }
       const { group, doc } = currentGroup.current;
       const elements = getSortedElements(group, doc);
       if (elements.length === 0) return;
 
       const lastIdx = lastFocusedByGroup.current[group];
-      let ci = elements.findIndex(
-        el => parseInt(el.getAttribute('tabindex') ?? '0', 10) === lastIdx
-      );
+      let ci = elements.findIndex(el => getTabindex(el) === lastIdx);
       if (ci === -1) ci = elements.indexOf(document.activeElement as HTMLElement);
 
-      const opts      = tabGroupOptions.current[group];
-      const rotation  = opts?.tabRotation !== false;
-      const chain     = groupChains.current[group];
+      const opts     = tabGroupOptions.current[group];
+      const rotation = opts?.tabRotation !== false;
+      const chain    = groupChains.current[group];
 
+      // 그룹 경계에서 체인 이동
       if (direction === 'DOWN' && ci === elements.length - 1) {
         if (chain?.next) { switchGroup(chain.next, 0); return; }
         if (!rotation) return;
@@ -196,8 +202,7 @@ export const useFocusManager = (): FocusManager => {
         if (chain?.prev) {
           const prevEls = getSortedElements(chain.prev, doc);
           if (prevEls.length > 0) {
-            const last = prevEls[prevEls.length - 1];
-            switchGroup(chain.prev, parseInt(last.getAttribute('tabindex') ?? '0', 10));
+            switchGroup(chain.prev, getTabindex(prevEls[prevEls.length - 1]));
             return;
           }
         }
@@ -211,29 +216,34 @@ export const useFocusManager = (): FocusManager => {
       const nextEl = elements[ni];
       if (!nextEl) return;
 
+      prevGroup.current = currentGroup.current;
       removeFocusedStyle(doc);
       nextEl.focus();
       nextEl.classList.add('focused');
-      lastFocusedByGroup.current[group] = parseInt(nextEl.getAttribute('tabindex') ?? '0', 10);
+      lastFocusedByGroup.current[group] = getTabindex(nextEl);
       playTtsFromElement(nextEl);
+      onMoved?.({ group, tabindex: getTabindex(nextEl), element: nextEl });
     },
     [getSortedElements, removeFocusedStyle, playTtsFromElement, switchGroup]
   );
 
   const getCurrentFocusInfo = useCallback((): FocusInfo | null => {
+    // 1순위: currentGroup ref
     if (currentGroup.current) {
       const { group, doc } = currentGroup.current;
       const tabindex = lastFocusedByGroup.current[group];
       if (tabindex !== undefined) {
-        const el = doc.querySelector<HTMLElement>(
-          `[data-tabfocus="Y"][data-tabgroup="${group}"][tabindex="${tabindex}"]`
-        );
+        const el = doc.querySelector<HTMLElement>(sel(group, tabindex));
         if (el) return { group, tabindex, element: el };
       }
     }
+    // 2순위: activeElement
     const active = document.activeElement as HTMLElement | null;
-    if (active?.getAttribute('data-tabfocus') === 'Y' &&
-        active.hasAttribute('data-tabgroup') && active.hasAttribute('tabindex')) {
+    if (
+      active?.getAttribute('data-tabfocus') === 'Y' &&
+      active.hasAttribute('data-tabgroup') &&
+      active.hasAttribute('tabindex')
+    ) {
       return {
         group:    active.getAttribute('data-tabgroup')!,
         tabindex: parseInt(active.getAttribute('tabindex')!, 10),
@@ -256,12 +266,11 @@ export const useFocusManager = (): FocusManager => {
 
   const activateFocusMode = useCallback(
     (group: string, tabindex = 0, doc: Document = document) => {
-      // rAF으로 React 렌더 완료 후 실행
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          initTabFocusWhenReady(doc, group, tabindex);
-        });
-      });
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() =>
+          initTabFocusWhenReady(doc, group, tabindex)
+        )
+      );
     },
     [initTabFocusWhenReady]
   );

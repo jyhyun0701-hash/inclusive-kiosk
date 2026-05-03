@@ -1,16 +1,13 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
-import "./assets/styles/global.css";
-import { initSpeech } from "./utils/speakSafe";
-import { FocusManagerProvider } from "./context/FocusManagerContext";
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import KeypadPage from './pages/KeypadPage';
+import './index.css';
 
-initSpeech();
+const isKeypad = window.location.pathname === '/keypad';
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-	<React.StrictMode>
-		<FocusManagerProvider>
-			<App />
-		</FocusManagerProvider>
-	</React.StrictMode>,
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    {isKeypad ? <KeypadPage /> : <App />}
+  </StrictMode>
 );

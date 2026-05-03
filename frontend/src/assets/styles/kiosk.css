@@ -217,6 +217,7 @@ html, body {
   outline: none;
 }
 .bottom-btn:active { transform: scale(0.97); filter: brightness(0.88); }
+.bottom-btn.focused,
 .bottom-btn:focus-visible { outline: 4px solid var(--yellow); outline-offset: 3px; }
 .bottom-btn.home    { background: var(--pink);     color: #111; }
 .bottom-btn.info    { background: var(--gray-mid); color: #111; }
@@ -297,6 +298,7 @@ html, body {
 
 .flag img { width: 85px; height: 85px; }
 .lang-btn.active { background: var(--blue-deep); }
+.lang-btn.focused,
 .lang-btn:focus-visible { outline: 4px solid var(--yellow); outline-offset: 4px; }
 
 /* ──────────────────────────────────────────────

@@ -106,7 +106,7 @@ const IdentityVerifyPage = () => {
       } else {
         setScanStatus('failed');
         setFailCount((c) => c + 1);
-        speakSafe('지문 인식에 실패하였습니다. 손가락을 다시 올려주십시오.');
+        speakSafe('지문 인식에 실패했습니다. 손가락이 건조하거나, 손가락 위치가 맞지 않으면 인식에 실패합니다. 손가락을 다시 올려주세요.');
         setTimeout(() => fm.initTabFocusWhenReady(document, 'verify-fp', 1), 400);
       }
     }, 2000);
@@ -193,7 +193,7 @@ const IdentityVerifyPage = () => {
               {scanStatus === 'idle'     && '지문 입력기에 엄지 손가락을 올려주십시오.'}
               {scanStatus === 'scanning' && '지문을 인식하고 있습니다. 잠시 기다려주십시오.'}
               {scanStatus === 'success'  && '지문 인식에 성공하였습니다.'}
-              {scanStatus === 'failed'   && '지문 인식에 실패하였습니다. 손가락을 다시 올려주십시오.'}
+              {scanStatus === 'failed'   && '지문 인식에 실패했습니다. 손가락이 건조하거나, 손가락 위치가 맞지 않으면 인식에 실패합니다. 손가락을 다시 올려주세요.'}
             </SMsg>
 
             <ScanArea
