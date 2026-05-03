@@ -25,10 +25,13 @@ type Screen =
 const speak = (text: string, lang: Language) => {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US';
-  u.rate = 0.95;
-  window.speechSynthesis.speak(u);
+
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US';
+    u.rate = 0.95;
+    window.speechSynthesis.speak(u);
+  }, 100);
 };
 
 const App: React.FC = () => {
@@ -47,12 +50,15 @@ const App: React.FC = () => {
   }, []);
 
   const handleToggleTts = () => {
-    setIsTtsOn(prev => {
-      const next = !prev;
-      if (next) speak('접근성 모드가 활성화되었습니다.', language);
-      else window.speechSynthesis?.cancel();
-      return next;
-    });
+    const next = !isTtsOn;
+    setIsTtsOn(next);
+
+    if (next) {
+      console.log('speak 호출 직전');
+      speak('접근성 모드가 활성화되었습니다.', language);
+    } else {
+      window.speechSynthesis?.cancel();
+    }
   };
 
   const handleToggleMagnify = () => setIsMagnified(p => !p);
