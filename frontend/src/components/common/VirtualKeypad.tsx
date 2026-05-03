@@ -1,6 +1,5 @@
 import { useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { useTTS } from '../../hooks/useTTS';
 
 export type KeypadKey =
   | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
@@ -26,25 +25,12 @@ interface VirtualKeypadProps {
  * - 보조 버튼 (취소/정정/듣기/?)
  */
 const VirtualKeypad = ({ isOpen, onClose, onKey }: VirtualKeypadProps) => {
-  const { speak } = useTTS();
 
   const handleKey = useCallback(
     (key: KeypadKey) => {
-      const ttsMap: Partial<Record<KeypadKey, string>> = {
-        NAVUP: '위로',
-        NAVDOWN: '아래로',
-        NAVPREVIOUS: '이전',
-        NAVNEXT: '다음',
-        NAVENTER: '확인',
-        KEY_CANCEL: '취소',
-        KEY_CORRECT: '정정',
-        KEY_LISTEN: '듣기',
-        NAVHELP: '도움말',
-      };
-      if (ttsMap[key]) speak(ttsMap[key]!);
       onKey(key);
     },
-    [onKey, speak]
+    [onKey]
   );
 
   // 컴퓨터 키보드 → 키패드 이벤트 연결

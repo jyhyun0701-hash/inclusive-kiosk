@@ -7,6 +7,8 @@ import CategorySearchPage from './pages/CategorySearchPage';
 import DocumentSearchPage from './pages/DocumentSearchPage';
 import IdentityVerificationPage from './pages/IdentityVerificationPage';
 import IssuancePage from './pages/IssuancePage';
+import VirtualKeypad, { type KeypadKey } from './components/common/VirtualKeypad';
+import { useFocusManager } from './hooks/useFocusManager';
 
 import {
   type Language, type Certificate, type CertificateCategory, QUICK_CERTIFICATES,
@@ -40,6 +42,8 @@ const App: React.FC = () => {
   const [isTtsOn, setIsTtsOn] = useState(false);
   const [isMagnified, setIsMagnified] = useState(false);
 
+  const fm = useFocusManager();
+
   const tts = useCallback((text: string) => {
     if (isTtsOn) speak(text, language);
   }, [isTtsOn, language]);
@@ -53,15 +57,23 @@ const App: React.FC = () => {
     const next = !isTtsOn;
     setIsTtsOn(next);
 
-    if (next) {
-      console.log('speak 호출 직전');
-      speak('접근성 모드가 활성화되었습니다.', language);
-    } else {
-      window.speechSynthesis?.cancel();
-    }
+    if (next) speak('접근성 모드가 활성화되었습니다.', language);
+    else window.speechSynthesis?.cancel();
   };
 
   const handleToggleMagnify = () => setIsMagnified(p => !p);
+
+  // ← 키패드 키 입력 처리
+  const handleKeypadKey = useCallback((key: KeypadKey) => {
+    switch (key) {
+      case 'NAVUP':       fm.moveByCurrentGroup('UP');   break;
+      case 'NAVDOWN':     fm.moveByCurrentGroup('DOWN'); break;
+      case 'NAVENTER':    (document.activeElement as HTMLElement)?.click(); break;
+      case 'KEY_CANCEL':  goHome(); break;
+      case 'KEY_LISTEN':  fm.readCurrentFocus(); break;
+      default: break;
+    }
+  }, [fm, goHome]);
 
   const common = {
     language, isTtsOn, isMagnified,
@@ -69,7 +81,6 @@ const App: React.FC = () => {
     onToggleMagnify: handleToggleMagnify,
   };
 
-  // ── 페이지 렌더 ──────────────────────────────────
   const renderPage = () => {
     switch (screen.id) {
       case 'main':
@@ -88,7 +99,6 @@ const App: React.FC = () => {
             }}
           />
         );
-
       case 'cert-list':
         return (
           <CertificateListPage
@@ -105,7 +115,6 @@ const App: React.FC = () => {
             onSearchClick={() => setScreen({ id: 'doc-search' })}
           />
         );
-
       case 'category-search':
         return (
           <CategorySearchPage
@@ -119,7 +128,6 @@ const App: React.FC = () => {
             onSearchClick={() => setScreen({ id: 'doc-search' })}
           />
         );
-
       case 'doc-search':
         return (
           <DocumentSearchPage
@@ -132,7 +140,6 @@ const App: React.FC = () => {
             onCategorySearch={() => setScreen({ id: 'category-search' })}
           />
         );
-
       case 'identity':
         return (
           <IdentityVerificationPage
@@ -145,7 +152,6 @@ const App: React.FC = () => {
             }}
           />
         );
-
       case 'issuance':
         return (
           <IssuancePage
@@ -158,9 +164,15 @@ const App: React.FC = () => {
   };
 
   return (
-    /* kiosk-wrap: 540×960 표시 박스 (scale 0.5 적용된 1080×1920 캔버스를 담음) */
     <div className="kiosk-wrap">
       {renderPage()}
+
+      {/* ← 키패드 추가 */}
+      <VirtualKeypad
+        isOpen={isTtsOn}
+        onClose={handleToggleTts}
+        onKey={handleKeypadKey}
+      />
     </div>
   );
 };
