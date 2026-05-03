@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
 import VirtualKeypad, { type KeypadKey } from '../components/common/VirtualKeypad';
+import '../assets/styles/keypad.css';
 
 const CHANNEL_NAME = 'kiosk-keypad';
 

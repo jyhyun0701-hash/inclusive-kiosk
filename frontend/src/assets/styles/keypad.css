@@ -1,0 +1,183 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #ffffff;
+  font-family: system-ui, sans-serif;
+  color: #1a1a1a;
+}
+
+/* 오버레이 — 새 창이므로 fixed 대신 일반 레이아웃 */
+.keypad-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* 키패드 본체 */
+.keypad-pad {
+  width: 260px;
+  background: #ffffff;
+  border: 2px solid #cccccc;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* 헤더 */
+.keypad-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #dddddd;
+}
+
+.keypad-headset-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.keypad-headset-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2ecc71;
+}
+
+.keypad-headset-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.keypad-close-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #cccccc;
+  background: transparent;
+  color: #555555;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.keypad-close-btn:hover { background: #eeeeee; }
+
+/* 바디 */
+.keypad-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.keypad-section-label {
+  font-size: 10px;
+  color: #888888;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* 방향키 */
+.keypad-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 40px);
+  gap: 5px;
+  width: 136px;
+  margin: 0 auto;
+}
+
+.keypad-nav-btn {
+  border-radius: 6px;
+  border: 1.5px solid #cccccc;
+  background: #f5f5f5;
+  color: #1a1a1a;
+  font-size: 14px;
+  cursor: pointer;
+}
+.keypad-nav-btn:hover  { background: #e0e0e0; }
+.keypad-nav-btn:active { transform: scale(0.92); }
+
+.keypad-ok-btn {
+  border-radius: 6px;
+  border: 1.5px solid #1a1a1a;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.keypad-ok-btn:hover { background: #333333; }
+
+/* 숫자 패드 */
+.keypad-number-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.keypad-number-btn {
+  height: 44px;
+  border-radius: 6px;
+  border: 1.5px solid #cccccc;
+  background: #f5f5f5;
+  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.keypad-number-btn:hover  { background: #e0e0e0; }
+.keypad-number-btn:active { transform: scale(0.92); }
+
+/* 보조 버튼 */
+.keypad-assist-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.keypad-assist-btn {
+  height: 36px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+}
+.keypad-assist-btn:active { transform: scale(0.92); }
+
+.keypad-assist-cancel  { border: 1.5px solid #e74c3c; color: #e74c3c; }
+.keypad-assist-correct { border: 1.5px solid #f5921e; color: #f5921e; }
+.keypad-assist-listen  { border: 1.5px solid #2ecc71; color: #2ecc71; }
+.keypad-assist-help    { border: 1.5px solid #3a8dd4; color: #3a8dd4; }
+
+.keypad-assist-cancel:hover  { background: rgba(231,76,60,0.1);  }
+.keypad-assist-correct:hover { background: rgba(245,146,30,0.1); }
+.keypad-assist-listen:hover  { background: rgba(46,204,113,0.1); }
+.keypad-assist-help:hover    { background: rgba(58,141,212,0.1); }
+
+/* 구분선 */
+.keypad-divider {
+  border: none;
+  border-top: 1px solid #dddddd;
+  margin: 0;
+}
+
+/* 힌트 */
+.keypad-hint {
+  font-size: 10px;
+  color: #aaaaaa;
+  text-align: center;
+  line-height: 1.5;
+}
