@@ -69,6 +69,7 @@ const App: React.FC = () => {
   const handleToggleTts = () => {
     const next = !isTtsOn;
     setIsTtsOn(next);
+    setGlobalTts(next);
     if (next) {
       speak('접근성 모드가 활성화되었습니다.', language);
       setTimeout(() => fm.activateFocusMode('main', 0), 300);
