@@ -14,6 +14,8 @@ const NumPad: React.FC<NumPadProps> = ({ value, onChange, onConfirm, maxLength =
     if (value.length < maxLength) onChange(value + key);
   };
 
+  const keys = ['1','2','3','4','5','6','7','8','9','del','0','confirm'];
+
   const rows = [
     ['1', '2', '3'],
     ['4', '5', '6'],
@@ -24,16 +26,23 @@ const NumPad: React.FC<NumPadProps> = ({ value, onChange, onConfirm, maxLength =
   return (
     <div className="numpad-wrap">
       {rows.map((row, ri) =>
-        row.map((key) => (
-          <button
-            key={`${ri}-${key}`}
-            className={`num-key${key === 'del' ? ' del' : ''}${key === 'confirm' ? ' confirm' : ''}`}
-            onClick={() => press(key)}
-            aria-label={key === 'del' ? '지우기' : key === 'confirm' ? '입력' : key}
-          >
-            {key === 'del' ? '지우기' : key === 'confirm' ? '입력' : key}
-          </button>
-        ))
+        row.map((key) => {
+          const label = key === 'del' ? '지우기' : key === 'confirm' ? '입력' : key;
+          return (
+            <button
+              key={`${ri}-${key}`}
+              className={`num-key${key === 'del' ? ' del' : ''}${key === 'confirm' ? ' confirm' : ''}`}
+              onClick={() => press(key)}
+              aria-label={label}
+              data-tabfocus="Y"
+              data-tabgroup="numpad"
+              data-ttsmsg={label}
+              tabIndex={keys.indexOf(key)}
+            >
+              {label}
+            </button>
+          );
+        })
       )}
     </div>
   );

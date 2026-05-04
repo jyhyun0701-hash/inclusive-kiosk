@@ -83,12 +83,16 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
         {/* 검색 결과 */}
         {query && results.length > 0 && (
           <div className="search-results">
-            {results.map(cert => (
+            {results.map((cert, idx) => (
               <button
                 key={cert.id}
                 className="search-result-btn"
                 onClick={() => setConfirmCert(cert)}
                 aria-label={cert.nameKo}
+                data-tabfocus="Y"
+                data-tabgroup="doc-search"
+                data-ttsmsg={cert.nameKo}
+                tabIndex={idx}
               >
                 {cert.nameKo}
               </button>

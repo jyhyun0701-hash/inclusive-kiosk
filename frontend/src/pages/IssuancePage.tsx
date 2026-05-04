@@ -79,6 +79,10 @@ const IssuancePage: React.FC<Props> = ({
                 className="cert-btn gray"
                 style={{ marginTop: 24 }}
                 onClick={() => setReceiptPrinted(true)}
+                data-tabfocus="Y"
+                data-tabgroup="issuance"
+                data-ttsmsg="영수증 발급"
+                tabIndex={0}
               >
                 영수증 발급
               </button>
@@ -92,6 +96,10 @@ const IssuancePage: React.FC<Props> = ({
               className="cert-btn"
               style={{ marginTop: 24 }}
               onClick={onHome}
+              data-tabfocus="Y"
+              data-tabgroup="issuance"
+              data-ttsmsg="처음으로 돌아가기"
+              tabIndex={receiptPrinted ? 0 : 1}
             >
               처음으로 돌아가기
             </button>

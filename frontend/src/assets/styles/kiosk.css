@@ -190,6 +190,12 @@ html, body {
   flex-shrink: 0;
 }
 
+/* 접근성 모드 포커스 공통 스타일 (applyFocus가 .focused 클래스를 추가) */
+[data-tabfocus="Y"].focused {
+  outline: 4px solid var(--yellow);
+  outline-offset: 3px;
+}
+
 .bottom-btn img {
   width: 42px;
   height: 42px;
@@ -628,7 +634,7 @@ html, body {
 .status-card.error   { background: #fde8e8; color: var(--error); }
 .status-card.success { background: #d5f5e3; color: #1e7e4e; }
 .status-card.neutral { background: #eaf0ff; color: var(--navy); }
-.status-card.done    { background: var(--yellow); color: #111; font-size: 44px; }
+.status-card.done    { background: var(--orange); color: #111; font-size: 44px; }
 
 .fingerprint-area {
   display: flex;
@@ -643,16 +649,20 @@ html, body {
    14. 발급 완료 테이블
    ────────────────────────────────────────────── */
 .issue-table {
-  width: 100%;
+  width: 700px;
+  height: 280px;
   border-collapse: collapse;
   font-size: 38px;
   margin: 28px 0;
+  background-color: #0F2A44;
+  color: #FFFFFF;
+  border-radius: 20px;
 }
 .issue-table td {
   padding: 30px 36px;
   border-bottom: 2px solid #e0e0e0;
 }
-.issue-table td:first-child { color: #777; width: 38%; }
+.issue-table td:first-child { color: #FFFFFF; font-weight: 600; }
 .issue-table td:last-child  { font-weight: 700; }
 
 /* ──────────────────────────────────────────────

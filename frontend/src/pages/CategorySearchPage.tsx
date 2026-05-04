@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useFocusManagerContext } from '../context/FocusManagerContext';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import ConfirmationModal from '../components/common/ConfirmationModal';
@@ -32,12 +33,24 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
   initialCategory, onHome, onToggleTts, onToggleMagnify,
   onCertificateConfirmed, onSearchClick,
 }) => {
+  const fm = useFocusManagerContext();
   const [selectedCategory, setSelectedCategory] = useState<CertificateCategory | null>(
     initialCategory ?? null
   );
   const [highlightedCertId, setHighlightedCertId] = useState<string | null>(null);
   const [confirmCert, setConfirmCert] = useState<Certificate | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+
+  useEffect(() => {
+    if (selectedCategory) {
+      fm.registerGroupChain('category',   { next: 'sub-cert',   prev: 'bottombar' });
+      fm.registerGroupChain('sub-cert',   { next: 'cat-bottom', prev: 'category'  });
+      fm.registerGroupChain('cat-bottom', { next: 'bottombar',  prev: 'sub-cert'  });
+    } else {
+      fm.registerGroupChain('category',   { next: 'cat-bottom', prev: 'bottombar' });
+      fm.registerGroupChain('cat-bottom', { next: 'bottombar',  prev: 'category'  });
+    }
+  }, [selectedCategory]);
 
   const handleCategoryClick = (cat: CertificateCategory) => {
     setSelectedCategory(prev => prev === cat ? null : cat);
@@ -99,7 +112,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
                   onClick={() => handleCertClick(cert)}
                   aria-label={cert.nameKo}
                   data-tabfocus="Y"
-                  data-tabgroup="category"
+                  data-tabgroup="sub-cert"
                   data-ttsmsg={cert.nameKo}
                   tabIndex={idx}
                 >
@@ -115,6 +128,10 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
           className="search-type-btn"
           onClick={onSearchClick}
           style={{ width: '100%', marginTop: 40 }}
+          data-tabfocus="Y"
+          data-tabgroup="cat-bottom"
+          data-ttsmsg="증명서 검색"
+          tabIndex={0}
         >
           증명서 검색
         </button>

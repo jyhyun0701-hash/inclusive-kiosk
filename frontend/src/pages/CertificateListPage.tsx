@@ -46,22 +46,40 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
       <main className="kiosk-content">
         {/* 상단 검색 타입 2버튼 */}
         <div className="search-type-row">
-          <button className="search-type-btn" onClick={onCategorySearchClick}>
+          <button
+            className="search-type-btn"
+            onClick={onCategorySearchClick}
+            data-tabfocus="Y"
+            data-tabgroup="cert-list-top"
+            data-ttsmsg={LABEL_CATEGORY[language]}
+            tabIndex={0}
+          >
             🔍 {LABEL_CATEGORY[language]}
           </button>
-          <button className="search-type-btn" onClick={onSearchClick}>
+          <button
+            className="search-type-btn"
+            onClick={onSearchClick}
+            data-tabfocus="Y"
+            data-tabgroup="cert-list-top"
+            data-ttsmsg={LABEL_SEARCH[language]}
+            tabIndex={1}
+          >
             🔍 {LABEL_SEARCH[language]}
           </button>
         </div>
 
         {/* 전체 증명서 그리드 */}
         <div className="all-category-grid">
-          {ALL_CERTIFICATES.map((cert) => (
+          {ALL_CERTIFICATES.map((cert, idx) => (
             <button
               key={cert.id}
               className="all-category-btn"
               onClick={() => onCertificateSelect(cert)}
               aria-label={cert.nameKo}
+              data-tabfocus="Y"
+              data-tabgroup="cert-list"
+              data-ttsmsg={cert.nameKo}
+              tabIndex={idx}
             >
               {cert.nameKo}
             </button>

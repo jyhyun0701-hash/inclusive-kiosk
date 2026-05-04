@@ -8,7 +8,7 @@ import DocumentSearchPage from './pages/DocumentSearchPage';
 import IdentityVerificationPage from './pages/IdentityVerificationPage';
 import IssuancePage from './pages/IssuancePage';
 import VirtualKeypad, { type KeypadKey } from './components/common/VirtualKeypad';
-import { useFocusManager } from './hooks/useFocusManager';
+import { useFocusManagerContext } from './context/FocusManagerContext';
 import { setGlobalTts} from './utils/speakSafe';
 
 import {
@@ -17,6 +17,19 @@ import {
 
 const CHANNEL_NAME = 'kiosk-keypad';
 const KEYPAD_FEATURES = 'width=280,height=520,resizable=no,scrollbars=no,location=no';
+
+// ── 화면별 첫 포커스 그룹 ──────────────────────────
+const getFirstGroupForScreen = (screenId: string): string => {
+  switch (screenId) {
+    case 'main':            return 'main';
+    case 'cert-list':       return 'cert-list-top';
+    case 'category-search': return 'category';
+    case 'doc-search':      return 'bottombar';
+    case 'identity':        return 'numpad';
+    case 'issuance':        return 'bottombar';
+    default:                return 'bottombar';
+  }
+};
 
 // ── 화면 타입 ──────────────────────────────────────
 type Screen =
@@ -53,33 +66,69 @@ const App: React.FC = () => {
   const handleKeypadKeyRef = useRef<((key: KeypadKey) => void) | null>(null);
   const handleToggleTtsRef = useRef<(() => void) | null>(null);
 
-  const fm = useFocusManager();
+  const fm = useFocusManagerContext();
+
+  const setupGroupsForScreen = useCallback((screenId: string) => {
+    switch (screenId) {
+      case 'main':
+        fm.registerGroupChain('main',          { next: 'lang',          prev: 'bottombar' });
+        fm.registerGroupChain('lang',          { next: 'bottombar',     prev: 'main' });
+        fm.registerGroupChain('bottombar',     { next: 'main',          prev: 'lang' });
+        break;
+      case 'cert-list':
+        fm.registerGroupChain('cert-list-top', { next: 'cert-list',     prev: 'bottombar' });
+        fm.registerGroupChain('cert-list',     { next: 'bottombar',     prev: 'cert-list-top' });
+        fm.registerGroupChain('bottombar',     { next: 'cert-list-top', prev: 'cert-list' });
+        break;
+      case 'category-search':
+        fm.registerGroupChain('category',      { next: 'cat-bottom',    prev: 'bottombar' });
+        fm.registerGroupChain('cat-bottom',    { next: 'bottombar',     prev: 'category' });
+        fm.registerGroupChain('bottombar',     { next: 'category',      prev: 'cat-bottom' });
+        break;
+      case 'doc-search':
+        fm.registerGroupChain('doc-search',    { next: 'bottombar',     prev: 'bottombar' });
+        fm.registerGroupChain('bottombar',     { next: 'doc-search',    prev: 'doc-search' });
+        break;
+      case 'identity':
+        fm.registerGroupChain('numpad',        { next: 'bottombar',     prev: 'bottombar' });
+        fm.registerGroupChain('identity',      { next: 'bottombar',     prev: 'bottombar' });
+        fm.registerGroupChain('bottombar',     { next: 'numpad',        prev: 'numpad' });
+        break;
+      case 'issuance':
+        fm.registerGroupChain('issuance',      { next: 'bottombar',     prev: 'bottombar' });
+        fm.registerGroupChain('bottombar',     { next: 'issuance',      prev: 'issuance' });
+        break;
+    }
+  }, [fm]);
 
  // 화면 전환 + TTS + 포커스 진입을 함께 처리하는 헬퍼
  const goTo = useCallback((nextScreen: Screen, ttsMsg?: string, group = 'main', tabindex = 0) => {
    if (ttsMsg) speak(ttsMsg, language);
+   setupGroupsForScreen(nextScreen.id);
    setScreen(nextScreen);
    if (isTtsOn) {
      setTimeout(() => fm.activateFocusMode(group, tabindex), 400);
    }
- }, [language, isTtsOn, fm]);
+ }, [language, isTtsOn, fm, setupGroupsForScreen]);
 
   const goHome = useCallback(() => {
     window.speechSynthesis?.cancel();
+    setupGroupsForScreen('main');
     setScreen({ id: 'main' });
-  }, []);
+  }, [setupGroupsForScreen]);
 
-  // 마운트 시 한 번만 그룹/체인 등록
+  // 마운트 시 한 번만 그룹 옵션 등록 + 초기 체인(main) 설정
   useEffect(() => {
-    fm.initTabGroup(document, 'main',      { tabRotation: false, playTtsOnMoved: true });
-    fm.initTabGroup(document, 'lang',      { tabRotation: false, playTtsOnMoved: true });
-    fm.initTabGroup(document, 'bottombar', { tabRotation: false, playTtsOnMoved: true });
+    const groups = [
+      'main', 'lang', 'bottombar',
+      'cert-list-top', 'cert-list',
+      'category', 'sub-cert', 'cat-bottom',
+      'doc-search', 'numpad', 'identity', 'issuance',
+    ];
+    groups.forEach(g => fm.initTabGroup(document, g, { tabRotation: false, playTtsOnMoved: true }));
+    setupGroupsForScreen('main');
 
-    fm.registerGroupChain('main',      { next: 'lang',      prev: 'bottombar' });
-    fm.registerGroupChain('lang',      { next: 'bottombar', prev: 'main' });
-    fm.registerGroupChain('bottombar', { next: 'main',      prev: 'lang' });
-
-    return () => {channelRef.current?.close(); };
+    return () => { channelRef.current?.close(); };
   }, []);  // ← 빈 배열: 마운트 시 1회만
 
 const openKeypad = useCallback(() => {
@@ -117,14 +166,16 @@ const closeKeypad = useCallback(() => {
     setGlobalTts(next);
     if (next) {
       speak('접근성 모드가 활성화되었습니다.', language);
-      setTimeout(() => fm.activateFocusMode('main', 0), 300);
+      setupGroupsForScreen(screen.id);
+      const firstGroup = getFirstGroupForScreen(screen.id);
+      setTimeout(() => fm.activateFocusMode(firstGroup, 0), 300);
       openKeypad();
     } else {
       fm.deactivateFocusMode();
       window.speechSynthesis?.cancel();
       closeKeypad();
     }
-  }, [isTtsOn, language, openKeypad, closeKeypad]);
+  }, [isTtsOn, language, screen, fm, setupGroupsForScreen, openKeypad, closeKeypad]);
 
   // ref를 항상 최신 함수로 동기화
   useEffect(() => {
@@ -161,10 +212,10 @@ const closeKeypad = useCallback(() => {
             onLanguageChange={(lang) => { setLanguage(lang); }}
             onCertificateSelect={(certId) => {
               const cert = QUICK_CERTIFICATES.find(c => c.id === certId)!;
-              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo}이 선택되었습니다.`, 'identity', 0);
+              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo}이 선택되었습니다.`, 'numpad', 0);
             }}
             onMoreCertificates={() => {
-              goTo({ id: 'cert-list' }, '증명서 전체 목록 화면으로 이동합니다.', 'cert-list', 0);
+              goTo({ id: 'cert-list' }, '증명서 전체 목록 화면으로 이동합니다.', 'cert-list-top', 0);
             }}
           />
         );
@@ -175,10 +226,10 @@ const closeKeypad = useCallback(() => {
             {...common}
             onHome={goHome}
             onCategorySearchClick={() => {
-              goTo({ id: 'category-search' }, '카테고리 검색 화면으로 이동합니다.', 'category-search', 0);
+              goTo({ id: 'category-search' }, '카테고리 검색 화면으로 이동합니다.', 'category', 0);
             }}
             onCertificateSelect={(cert) => {
-              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'identity', 0);
+              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'numpad', 0);
             }}
             onSearchClick={() => goTo({ id: 'doc-search' }, '문서 검색 화면으로 이동합니다.', 'doc-search', 0)}
           />
@@ -191,7 +242,7 @@ const closeKeypad = useCallback(() => {
             initialCategory={screen.initialCategory}
             onHome={goHome}
             onCertificateConfirmed={(cert) => {
-              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'identity', 0);
+              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'numpad', 0);
             }}
             onSearchClick={() => goTo({ id: 'doc-search' }, undefined, 'doc-search', 0)}
           />
@@ -203,7 +254,7 @@ const closeKeypad = useCallback(() => {
             {...common}
             onHome={goHome}
             onCertificateConfirmed={(cert) => {
-              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'identity', 0);
+              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'numpad', 0);
             }}
             onCategorySearch={() => goTo({ id: 'category-search' }, undefined, 'category-search', 0)}
           />
@@ -219,7 +270,7 @@ const closeKeypad = useCallback(() => {
               goTo(
                 { id: 'issuance', certificate: screen.certificate },
                 '본인 확인이 완료되었습니다. 문서를 출력합니다.',
-                'issuance', 0
+                'bottombar', 0
               );
             }}
           />
