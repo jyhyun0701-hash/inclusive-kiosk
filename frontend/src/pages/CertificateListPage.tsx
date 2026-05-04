@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import InfoModal from '../components/common/InfoModal';
+import imgSearch from '../assets/images/search.png';
 import { type Language, type Certificate, ALL_CERTIFICATES } from '../types/kiosk';
 
 interface CertificateListPageProps {
@@ -54,7 +55,8 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
             data-ttsmsg={LABEL_CATEGORY[language]}
             tabIndex={0}
           >
-            🔍 {LABEL_CATEGORY[language]}
+             <img src={imgSearch} alt="search" />
+             {LABEL_CATEGORY[language]}
           </button>
           <button
             className="search-type-btn"
@@ -64,7 +66,8 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
             data-ttsmsg={LABEL_SEARCH[language]}
             tabIndex={1}
           >
-            🔍 {LABEL_SEARCH[language]}
+            <img src={imgSearch} alt="search" />
+            {LABEL_SEARCH[language]}
           </button>
         </div>
 

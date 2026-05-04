@@ -4,6 +4,7 @@ import BottomBar from '../components/common/BottomBar';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import InfoModal from '../components/common/InfoModal';
 import KoreanKeyboard from '../components/common/keyboards/KoreanKeyboard';
+import imgSearch from '../assets/images/search.png';
 import { type Language, type Certificate, ALL_CERTIFICATES } from '../types/kiosk';
 
 interface DocumentSearchPageProps {
@@ -63,7 +64,9 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
       <main className="kiosk-content">
         {/* 검색창 */}
         <div className="search-bar">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon">
+            <img src={imgSearch} alt="search"/>
+          </span>
           <input
             type="text"
             value={query}

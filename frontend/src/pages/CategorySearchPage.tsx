@@ -4,6 +4,8 @@ import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import InfoModal from '../components/common/InfoModal';
+import imgCategory from '../assets/images/category.png';
+import imgSearch from '../assets/images/search.png';
 import {
   type Language, type Certificate, type CertificateCategory,
   CATEGORY_TABS, CERTIFICATES_BY_CATEGORY,
@@ -77,6 +79,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
         {/* 섹션 헤더 */}
         <div className="section-label">
           <span>증명서 카테고리</span>
+          <img src={imgCategory} alt="category" />
         </div>
 
         {/* 6개 카테고리 3×2 그리드 */}
@@ -103,6 +106,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
           <>
             <div className="section-label">
               <span>선택한 카테고리 목록</span>
+              <img src={imgCategory} alt="category" />
             </div>
             <div className="sub-cert-grid">
               {subCerts.map((cert, idx) => (
@@ -127,12 +131,12 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
         <button
           className="search-type-btn"
           onClick={onSearchClick}
-          style={{ width: '100%', marginTop: 40 }}
           data-tabfocus="Y"
           data-tabgroup="cat-bottom"
           data-ttsmsg="증명서 검색"
           tabIndex={0}
         >
+          <img src={imgSearch} alt="search" />
           증명서 검색
         </button>
       </main>
