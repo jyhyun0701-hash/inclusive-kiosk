@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import InfoModal from '../components/common/InfoModal';
-import { type Language, ALL_CATEGORIES, type CertificateCategory } from '../types/kiosk';
+import { type Language, type Certificate, ALL_CERTIFICATES } from '../types/kiosk';
 
 interface CertificateListPageProps {
   language: Language;
@@ -12,7 +12,7 @@ interface CertificateListPageProps {
   onToggleTts: () => void;
   onToggleMagnify: () => void;
   onCategorySearchClick: () => void;
-  onCategorySelect: (category: CertificateCategory) => void;
+  onCertificateSelect: (cert: Certificate) => void;
   onSearchClick: () => void;
 }
 
@@ -32,7 +32,7 @@ const LABEL_SEARCH: Record<Language, string> = {
 const CertificateListPage: React.FC<CertificateListPageProps> = ({
   language, isTtsOn, isMagnified,
   onHome, onToggleTts, onToggleMagnify,
-  onCategorySearchClick, onCategorySelect, onSearchClick,
+  onCategorySearchClick, onCertificateSelect, onSearchClick,
 }) => {
   const [showInfo, setShowInfo] = useState(false);
 
@@ -54,16 +54,16 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
           </button>
         </div>
 
-        {/* 전체 카테고리 그리드 */}
+        {/* 전체 증명서 그리드 */}
         <div className="all-category-grid">
-          {ALL_CATEGORIES.map((cat) => (
+          {ALL_CERTIFICATES.map((cert) => (
             <button
-              key={cat}
+              key={cert.id}
               className="all-category-btn"
-              onClick={() => onCategorySelect(cat)}
-              aria-label={cat}
+              onClick={() => onCertificateSelect(cert)}
+              aria-label={cert.nameKo}
             >
-              {cat}
+              {cert.nameKo}
             </button>
           ))}
         </div>

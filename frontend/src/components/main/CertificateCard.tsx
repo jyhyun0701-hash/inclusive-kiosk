@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { useTTS } from '../../hooks/useTTS';
 import type { Certificate } from '../../types/certificate';
 
 interface CertificateCardProps {
@@ -13,10 +12,8 @@ const CertificateCard = ({
   onClick,
   isFavorite = false,
 }: CertificateCardProps) => {
-  const { speak } = useTTS();
 
   const handleClick = () => {
-    speak(`${certificate.nameKo} 선택되었습니다.`);
     onClick(certificate);
   };
 
@@ -32,13 +29,11 @@ const CertificateCard = ({
         }
       }}
     >
-      {isFavorite && (
-        <FavoriteBadge aria-hidden="true">★</FavoriteBadge>
-      )}
-      <CardText>{certificate.nameKo}</CardText>
-    </Card>
-  );
-};
+       {isFavorite && <FavoriteBadge aria-hidden="true">★</FavoriteBadge>}
+            <CardText>{certificate.nameKo}</CardText>
+          </Card>
+        );
+    };
 
 export default CertificateCard;
 

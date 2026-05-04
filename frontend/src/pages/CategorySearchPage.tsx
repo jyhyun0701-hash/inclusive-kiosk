@@ -68,13 +68,17 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
 
         {/* 6개 카테고리 3×2 그리드 */}
         <div className="category-grid-6">
-          {CATEGORY_TABS.map((cat) => (
+          {CATEGORY_TABS.map((cat, idx) => (
             <button
               key={cat}
               className={`category-btn-6${selectedCategory === cat ? ' selected' : ''}`}
               onClick={() => handleCategoryClick(cat)}
               aria-pressed={selectedCategory === cat}
               aria-label={cat}
+              data-tabfocus="Y"
+              data-tabgroup="category"
+              data-ttsmsg={cat}
+              tabIndex={idx}
             >
               {cat}
             </button>
@@ -88,12 +92,16 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
               <span>선택한 카테고리 목록</span>
             </div>
             <div className="sub-cert-grid">
-              {subCerts.map((cert) => (
+              {subCerts.map((cert, idx) => (
                 <button
                   key={cert.id}
                   className={`sub-cert-btn${highlightedCertId === cert.id ? ' selected' : ''}`}
                   onClick={() => handleCertClick(cert)}
                   aria-label={cert.nameKo}
+                  data-tabfocus="Y"
+                  data-tabgroup="category"
+                  data-ttsmsg={cert.nameKo}
+                  tabIndex={idx}
                 >
                   {cert.nameKo}
                 </button>

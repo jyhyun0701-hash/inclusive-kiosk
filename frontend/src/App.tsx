@@ -177,8 +177,8 @@ const closeKeypad = useCallback(() => {
             onCategorySearchClick={() => {
               goTo({ id: 'category-search' }, '카테고리 검색 화면으로 이동합니다.', 'category-search', 0);
             }}
-            onCategorySelect={(cat) => {
-              goTo({ id: 'category-search', initialCategory: cat }, `${cat} 카테고리를 선택하셨습니다.`, 'category-search', 0);
+            onCertificateSelect={(cert) => {
+              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'identity', 0);
             }}
             onSearchClick={() => goTo({ id: 'doc-search' }, '문서 검색 화면으로 이동합니다.', 'doc-search', 0)}
           />
