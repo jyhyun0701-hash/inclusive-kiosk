@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import type { Language, Certificate } from '../types/kiosk';
+import imgPrint from '../assets/images/print.png';
 
 type IssueStep = 'preparing' | 'printing' | 'done';
 
@@ -56,13 +57,15 @@ const IssuancePage: React.FC<Props> = ({
         <div className="header-title">{HEADER[step][language]}</div>
       </header>
 
-      <main className="kiosk-content">
+      <main className="kiosk-content content-verify">
         {step !== 'done' ? (
           <div className={`fingerprint-area${step === 'printing' ? ' printing' : ''}`}>
-            <div className="status-card info" style={{ width: '100%' }}>
+            <div className="status-card printing" style={{ width: '100%' }}>
               {step === 'preparing' ? '문서 출력을 준비하고 있습니다.' : '문서가 출력되고 있습니다.'}
             </div>
-            <div className="fingerprint-icon">🖨️</div>
+            <div className="fingerprint-icon">
+              <img src={imgPrint} alt="print" />
+            </div>
           </div>
         ) : (
           <>

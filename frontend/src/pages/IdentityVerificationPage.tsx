@@ -4,6 +4,10 @@ import BottomBar from '../components/common/BottomBar';
 import InfoModal from '../components/common/InfoModal';
 import NumPad from './../components/common/keyboards/NumPad';
 import type { Language, Certificate } from '../types/kiosk';
+import { useFocusManagerContext } from '../context/FocusManagerContext';
+import imgFPSuccess from '../assets/images/fingerprint-success.png';
+import imgFPFail from '../assets/images/fingerprint-fail.png';
+import imgFPScan from '../assets/images/fingerprint-scan.png';
 
 type VerifyStep = 'id-input' | 'fp-wait' | 'fp-fail' | 'fp-ok';
 
@@ -57,9 +61,21 @@ const IdentityVerificationPage: React.FC<Props> = ({
   language, certificate, isTtsOn, isMagnified,
   onHome, onToggleTts, onToggleMagnify, onVerified,
 }) => {
+  const fm = useFocusManagerContext();
   const [step, setStep] = useState<VerifyStep>('id-input');
   const [id, setId] = useState('');
   const [showInfo, setShowInfo] = useState(false);
+
+  useEffect(() => {
+    if (step === 'fp-fail') {
+      fm.registerGroupChain('bottombar', { next: 'identity', prev: 'identity' });
+      fm.registerGroupChain('identity',  { next: 'bottombar', prev: 'bottombar' });
+      if (isTtsOn) setTimeout(() => fm.activateFocusMode('identity', 0), 300);
+    } else if (step === 'id-input') {
+      fm.registerGroupChain('bottombar', { next: 'numpad', prev: 'numpad' });
+      fm.registerGroupChain('numpad',    { next: 'bottombar', prev: 'bottombar' });
+    }
+  }, [step, isTtsOn]);
 
   // 지문 시뮬레이션
   useEffect(() => {
@@ -104,7 +120,9 @@ const IdentityVerificationPage: React.FC<Props> = ({
 
         {step === 'fp-wait' && (
           <div className="fingerprint-area">
-            <div className="fingerprint-icon">👆</div>
+            <div className="fingerprint-icon">
+              <img src={imgFPScan} alt="scan"/>
+            </div>
             <div className="status-card info" style={{ width: '100%' }}>
               지문 입력기에 엄지 손가락을 올려주십시오.
             </div>
@@ -114,14 +132,21 @@ const IdentityVerificationPage: React.FC<Props> = ({
         {step === 'fp-fail' && (
           <>
             <div className="status-card error">
-              지문 인식에 실패했습니다. 손가락을 다시 올려주세요.
+              지문 인식에 실패했습니다.
+              손가락이 건조하거나, 손가락 위치가 맞지 않으면 인식에 실패합니다. 손가락을 다시 올려주세요.
             </div>
             <div className="fingerprint-area">
-              <div className="fingerprint-icon" style={{ opacity: 0.5 }}>🫸</div>
+              <div className="fingerprint-icon">
+               <img src={imgFPFail} alt="fail"/>
+              </div>
               <button
-                className="cert-btn"
+                className="cert-btn gray"
                 style={{ maxWidth: 500 }}
                 onClick={() => setStep('fp-wait')}
+                data-tabfocus="Y"
+                data-tabgroup="identity"
+                data-ttsmsg="다시 시도"
+                tabIndex={0}
               >
                 다시 시도
               </button>
@@ -134,7 +159,9 @@ const IdentityVerificationPage: React.FC<Props> = ({
             <div className="status-card success" style={{ width: '100%' }}>
               지문 인식에 성공하였습니다.
             </div>
-            <div className="fingerprint-icon">✅</div>
+            <div className="fingerprint-icon">
+              <img src={imgFPSuccess} alt="success"/>
+            </div>
           </div>
         )}
       </main>

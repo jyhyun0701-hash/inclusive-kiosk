@@ -622,6 +622,7 @@ html, body {
    13. 상태 카드
    ────────────────────────────────────────────── */
 .status-card {
+  width: 800px;
   border-radius: var(--r);
   padding: 44px 52px;
   font-size: 40px;
@@ -629,18 +630,19 @@ html, body {
   line-height: 1.65;
   margin-bottom: 40px;
   text-align: center;
+  color: var(--text);
 }
-.status-card.info    { background: #d6e8ff; color: var(--navy); }
-.status-card.error   { background: #fde8e8; color: var(--error); }
-.status-card.success { background: #d5f5e3; color: #1e7e4e; }
-.status-card.neutral { background: #eaf0ff; color: var(--navy); }
-.status-card.done    { background: var(--orange); color: #111; font-size: 44px; }
+.status-card.info    { background: #D6D6D6; }
+.status-card.error   { background: #FD0000; }
+.status-card.success { background: #00E3AE; }
+.status-card.printing { background: #55D5FF; }
+.status-card.done    { background: var(--orange); font-size: 44px; }
 
 .fingerprint-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
+  gap: 80px;
   padding: 60px 0;
 }
 .fingerprint-icon { font-size: 260px; line-height: 1; }
