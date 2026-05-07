@@ -82,6 +82,16 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
         {isMagnified && <NavPad onNavigate={navigate} />}
         <div ref={wrapRef} className="content-scroll-wrap">
           <div ref={innerRef} className="content-wrap-category">
+          <button
+            className="search-type-btn"
+            onClick={onSearchClick}
+            style={{ marginLeft: 'auto', marginBottom: '35px' }}
+            aria-label="증명서 검색"
+          >
+            <img src={imgSearch} alt="search" />
+            증명서 검색
+          </button>
+
           {/* 섹션 헤더 */}
           <div className="section-label">
             <span>증명서 카테고리</span>
@@ -132,15 +142,6 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
               </div>
             </>
           )}
-          <button
-            className="search-type-btn"
-            onClick={onSearchClick}
-            style={{ position: 'absolute', bottom: '-300px', right: '5px', zIndex: 50 }}
-            aria-label="증명서 검색"
-          >
-            <img src={imgSearch} alt="search" />
-            증명서 검색
-          </button>
           </div>
         </div>
       </main>
