@@ -50,7 +50,7 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
       <main className="kiosk-content">
         {isMagnified && <NavPad onNavigate={navigate} />}
         <div ref={wrapRef} className="content-scroll-wrap">
-          <div ref={innerRef}>
+          <div ref={innerRef} className="content-wrap-list">
           {/* 상단 검색 타입 2버튼 */}
           <div className="search-type-row">
             <button

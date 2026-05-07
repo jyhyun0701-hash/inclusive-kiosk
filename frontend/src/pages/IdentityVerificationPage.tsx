@@ -102,7 +102,7 @@ const IdentityVerificationPage: React.FC<Props> = ({
       <main className="kiosk-content content-verify">
         {isMagnified && <NavPad onNavigate={navigate} />}
         <div ref={wrapRef} className="content-scroll-wrap">
-          <div ref={innerRef}>
+          <div ref={innerRef} className="content-wrap-verify">
           {step === 'id-input' && (
             <>
               {/* 입력값 표시 */}
@@ -126,11 +126,11 @@ const IdentityVerificationPage: React.FC<Props> = ({
 
           {step === 'fp-wait' && (
             <div className="fingerprint-area">
-              <div className="fingerprint-icon">
-                <img src={imgFPScan} alt="scan"/>
-              </div>
               <div className="status-card info" style={{ width: '100%' }}>
                 지문 입력기에 엄지 손가락을 올려주십시오.
+              </div>
+              <div className="fingerprint-icon">
+                <img src={imgFPScan} alt="scan"/>
               </div>
             </div>
           )}

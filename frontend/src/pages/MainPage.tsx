@@ -59,7 +59,7 @@ const MainPage: React.FC<MainPageProps> = ({
       <main className="kiosk-content content-verify">
         {isMagnified && <NavPad onNavigate={navigate} />}
         <div ref={wrapRef} className="content-scroll-wrap">
-          <div ref={innerRef}>
+          <div ref={innerRef} className="content-wrap-main">
           <div className="section-title">
             <span className="star">★</span>
             <span>{QUICK_LABEL[language]}</span>
@@ -92,30 +92,29 @@ const MainPage: React.FC<MainPageProps> = ({
               {MORE_LABEL[language]}
             </button>
           </div>
+          <div className="lang-selector">
+            {LANG_LIST.map((l, idx) => (
+              <button
+                key={l.code}
+                className={`lang-btn${language === l.code ? ' active' : ''}`}
+                onClick={() => onLanguageChange(l.code)}
+                data-tabfocus="Y"
+                data-tabgroup="lang"
+                data-ttsmsg={l.label}
+                tabIndex={idx}
+                aria-label={l.label}
+                aria-pressed={language === l.code}
+              >
+                <span className="flag">
+                 <img src={l.img} alt={`${l.label} flag`} />
+                </span>
+                <span>{l.label}</span>
+              </button>
+            ))}
+          </div>
           </div>
         </div>
       </main>
-
-      <div className="lang-selector">
-        {LANG_LIST.map((l, idx) => (
-          <button
-            key={l.code}
-            className={`lang-btn${language === l.code ? ' active' : ''}`}
-            onClick={() => onLanguageChange(l.code)}
-            data-tabfocus="Y"
-            data-tabgroup="lang"
-            data-ttsmsg={l.label}
-            tabIndex={idx}
-            aria-label={l.label}
-            aria-pressed={language === l.code}
-          >
-            <span className="flag">
-             <img src={l.img} alt={`${l.label} flag`} />
-            </span>
-            <span>{l.label}</span>
-          </button>
-        ))}
-      </div>
 
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
 

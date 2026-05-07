@@ -803,20 +803,80 @@ html, body {
   overflow: hidden;       /* content-scroll-wrap 안에서만 스크롤 */
 }
 
-/* ── content-scroll-wrap: 실제 스크롤 컨테이너 ─────────────────
-   kiosk-content 의 직접 자식 div.
-   isMagnified 시 useMagnify hook 이 overflow:scroll 로 변경.
-   스크롤바는 숨김 (nav 버튼으로만 이동).
-   ─────────────────────────────────────────────────────────────── */
+/* ── content-scroll-wrap 기본값 ──────────────────────────────── */
 .content-scroll-wrap {
   width: 100%;
   height: 100%;
-  overflow: auto;              /* 기본: 세로 스크롤 허용 */
+  overflow: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 .content-scroll-wrap::-webkit-scrollbar {
   display: none;
+}
+
+/* ── kiosk-content: NavPad absolute 기준점 ───────────────────── */
+.kiosk-content {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── MainPage: cert-list/lang-selector 세로 중앙 정렬 ────────── */
+.content-wrap-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  gap: 60px;
+}
+
+/* ── IssuancePage: 발급 완료 내용 중앙 정렬 ──────────────────── */
+.content-wrap-issuance {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.content-wrap-issuance .status-card,
+.content-wrap-issuance .issue-table,
+.content-wrap-issuance .cert-btn {
+  width: 100%;
+  max-width: 826px;
+}
+.content-wrap-issuance .issue-table {
+  margin: 24px 0;
+}
+
+/* ── IdentityVerificationPage: 본인확인 내용 중앙 정렬 ──────── */
+.content-wrap-verify {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+/* 기존 .content-verify > .xxx 셀렉터가 DOM 구조상 동작 안 함 → 수정 */
+.content-wrap-verify .id-display,
+.content-wrap-verify .numpad-wrap {
+  width: 100%;
+  max-width: 826px;
+}
+.content-wrap-verify .id-display {
+  margin-bottom: 44px;
+}
+
+/* ── 지문 인식 영역 ──────────────────────────────────────────── */
+.fingerprint-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 40px;
+}
+/* status-card 먼저, 이미지 아래 — JSX 순서로 제어 */
+.fingerprint-area .status-card {
+  width: 100%;
+  max-width: 826px;
 }
 
 /* ── NavPad 공통 ─────────────────────────────────────────────── */
@@ -831,18 +891,18 @@ html, body {
   align-items: center;
   justify-content: center;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
-
 .nav-pad img {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: contain;
+  pointer-events: none;
 }
-
 .nav-pad:active { opacity: 0.75; }
 
-/* 위 — 상단 중앙 */
+/* 위 */
 .nav-pad--up {
   top: 20px;
   left: 50%;
@@ -851,7 +911,7 @@ html, body {
   height: 105px;
 }
 
-/* 아래 — 하단 중앙 */
+/* 아래 */
 .nav-pad--down {
   bottom: 20px;
   left: 50%;

@@ -67,7 +67,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
       <main className="kiosk-content">
         {isMagnified && <NavPad onNavigate={navigate} />}
         <div ref={wrapRef} className="content-scroll-wrap">
-          <div ref={innerRef}>
+          <div ref={innerRef} className="content-wrap-search">
           {/* 검색창 */}
           <div className="search-bar">
             <span className="search-icon">

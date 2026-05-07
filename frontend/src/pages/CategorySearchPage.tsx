@@ -81,7 +81,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
       <main className="kiosk-content">
         {isMagnified && <NavPad onNavigate={navigate} />}
         <div ref={wrapRef} className="content-scroll-wrap">
-          <div ref={innerRef}>
+          <div ref={innerRef} className="content-wrap-category">
           {/* 섹션 헤더 */}
           <div className="section-label">
             <span>증명서 카테고리</span>

@@ -63,7 +63,7 @@ const IssuancePage: React.FC<Props> = ({
       <main className="kiosk-content content-verify">
         {isMagnified && <NavPad onNavigate={navigate} />}
         <div ref={wrapRef} className="content-scroll-wrap">
-          <div ref={innerRef}>
+          <div ref={innerRef} className="content-wrap-issuance">
           {step !== 'done' ? (
             <div className={`fingerprint-area${step === 'printing' ? ' printing' : ''}`}>
               <div className="status-card printing" style={{ width: '100%' }}>

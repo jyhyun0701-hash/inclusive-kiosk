@@ -1,60 +1,46 @@
 import { useRef, useEffect, useCallback } from 'react';
 
 /**
- * useMagnify
- * ─────────────────────────────────────────────────────────────
- * [구조]
+ * useMagnify — common.js setUiMagnification / uiNavigate React 포팅
  *
- *  <main className="kiosk-content ...">          ← 이 요소에는 ref 없음
- *    {isMagnified && <NavPad onNavigate={navigate} />}  ← kiosk-content 직접 자식 (absolute)
- *    <div ref={wrapRef} className="content-scroll-wrap"> ← scroll 컨테이너
- *      <div ref={innerRef}>                              ← zoom 대상
- *        ...기존 JSX 그대로...
- *      </div>
- *    </div>
- *  </main>
- *
- * [왜 두 단계인가?]
- *  - NavPad(position:absolute)는 kiosk-content 기준으로 고정
- *  - scroll은 content-scroll-wrap 에서만 발생
- *  - NavPad는 scroll되지 않고 항상 같은 위치에 고정됨
- * ─────────────────────────────────────────────────────────────
+ * 핵심 수정:
+ *   zoom: 200% 적용 시 자식 레이아웃 폭이 절반(1000px→500px)으로 줄어드는
+ *   CSS zoom 동작을 보상하기 위해 inner.style.width = '200%' 추가.
+ *   → 자식이 1000px 폭을 그대로 사용하므로 레이아웃이 유지됨.
  */
 
-const MAG_LEVEL  = 2.0;    // 확대 배율
+const MAG_LEVEL   = 2.0;   // 확대 배율
 const SCROLL_STEP = 300;   // common.js moveScrollDistance 동일
 
 export type MagnifyDirection = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 
 export function useMagnify(isMagnified: boolean) {
-  // wrapRef: content-scroll-wrap div (scroll 컨테이너)
-  const wrapRef  = useRef<HTMLDivElement>(null);
-  // innerRef: zoom 적용 대상 div
-  const innerRef = useRef<HTMLDivElement>(null);
+  const wrapRef  = useRef<HTMLDivElement>(null);   // content-scroll-wrap
+  const innerRef = useRef<HTMLDivElement>(null);   // zoom 대상
 
   useEffect(() => {
     const wrap  = wrapRef.current;
     const inner = innerRef.current;
     if (!wrap || !inner) return;
 
-    // wheel/touch 스크롤 방지 핸들러
     const preventDefault = (e: Event) => e.preventDefault();
 
     if (isMagnified) {
-      // ── setUiMagnification 동일 로직 ──
-      inner.style.zoom      = `${MAG_LEVEL * 100}%`;
-      wrap.scrollLeft       = 0;
-      wrap.scrollTop        = 0;
-      // 좌측 달라붙는 보정 패딩 (기존 paddingFix = (magLevel - 1) * 40)
+      inner.style.zoom = `${MAG_LEVEL * 100}%`;
+      // zoom: 200%는 자식 레이아웃 폭을 절반으로 줄임 → 200%로 보상
+      inner.style.width = `${MAG_LEVEL * 100}%`;
+      wrap.scrollLeft        = 0;
+      wrap.scrollTop         = 0;
+      // 좌측 달라붙는 보정 (기존 paddingFix = (magLevel - 1) * 40)
       wrap.style.paddingLeft = `${(MAG_LEVEL - 1) * 40}px`;
-      wrap.style.overflow   = 'scroll';
+      wrap.style.overflow    = 'scroll';
 
-      // 사용자가 직접 스크롤하는 것을 막음 (nav 버튼으로만 이동)
+      // 사용자 직접 스크롤 방지 (nav 버튼으로만 이동)
       wrap.addEventListener('wheel',     preventDefault, { passive: false });
       wrap.addEventListener('touchmove', preventDefault, { passive: false });
     } else {
-      // ── 확대 해제 ──
       inner.style.zoom       = '';
+      inner.style.width      = '';  // 초기화
       wrap.scrollLeft        = 0;
       wrap.scrollTop         = 0;
       wrap.style.paddingLeft = '';
@@ -65,20 +51,19 @@ export function useMagnify(isMagnified: boolean) {
     }
 
     return () => {
-      // cleanup: 언마운트 시에도 이벤트 제거
       wrap.removeEventListener('wheel',     preventDefault);
       wrap.removeEventListener('touchmove', preventDefault);
     };
   }, [isMagnified]);
 
-  // uiNavigate 동일 로직
+  // uiNavigate 동일 로직 — zoom 배율 반영한 이동 거리
   const navigate = useCallback((direction: MagnifyDirection) => {
     const wrap  = wrapRef.current;
     const inner = innerRef.current;
     if (!wrap || !inner) return;
 
     const zoomLevel = parseFloat((inner.style.zoom || '100%').replace('%', '')) / 100;
-    const step = SCROLL_STEP * zoomLevel;
+    const step      = SCROLL_STEP * zoomLevel;
 
     switch (direction) {
       case 'UP':    wrap.scrollTop  = Math.max(0, wrap.scrollTop  - step); break;
