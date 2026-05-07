@@ -56,7 +56,7 @@ const IssuancePage: React.FC<Props> = ({
   return (
     <div className="kiosk-root">
       <header className="kiosk-header">
-        <StepIndicator currentStep={4} language={language} />
+        <StepIndicator currentStep={step === 'done' ? 5 : 4} language={language} />
         <div className="header-title">{HEADER[step][language]}</div>
       </header>
 
@@ -86,7 +86,7 @@ const IssuancePage: React.FC<Props> = ({
               {!receiptPrinted ? (
                 <button
                   className="cert-btn gray"
-                  style={{ marginTop: 24 }}
+                  style={{ width: '600px', maxWidth: '600px', marginTop: '25px'}}
                   onClick={() => setReceiptPrinted(true)}
                   data-tabfocus="Y"
                   data-tabgroup="issuance"
@@ -103,7 +103,7 @@ const IssuancePage: React.FC<Props> = ({
 
               <button
                 className="cert-btn"
-                style={{ marginTop: 50 }}
+                style={{ width: '600px', maxWidth: '600px' }}
                 onClick={onHome}
                 data-tabfocus="Y"
                 data-tabgroup="issuance"

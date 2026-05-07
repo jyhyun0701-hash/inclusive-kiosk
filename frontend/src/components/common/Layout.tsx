@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Breadcrumb from './Breadcrumb';
 
 interface LayoutProps {
-  currentStep: 1 | 2 | 3 | 4;
+  currentStep: 1 | 2 | 3 | 4 | 5;
   title: string;
   children: ReactNode;
   modal?: ReactNode;

@@ -4,7 +4,7 @@
 
 export type Language = 'ko' | 'en' | 'ja' | 'zh';
 
-export type KioskStep = 1 | 2 | 3 | 4;
+export type KioskStep = 1 | 2 | 3 | 4 | 5;
 
 export interface Certificate {
   id: string;
