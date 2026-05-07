@@ -59,7 +59,8 @@ const MainPage: React.FC<MainPageProps> = ({
       <main className="kiosk-content content-verify">
         {isMagnified && <NavPad onNavigate={navigate} />}
         <div ref={wrapRef} className="content-scroll-wrap">
-          <div ref={innerRef} className="content-wrap-main">
+          <div ref={innerRef} className="content-wrap-main" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+          <div className="main-content-top" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div className="section-title">
             <span className="star">★</span>
             <span>{QUICK_LABEL[language]}</span>
@@ -92,7 +93,8 @@ const MainPage: React.FC<MainPageProps> = ({
               {MORE_LABEL[language]}
             </button>
           </div>
-          <div className="lang-selector">
+          </div>
+          <div className="lang-selector" style={{ marginTop: 'auto', paddingBottom: '0' }}>
             {LANG_LIST.map((l, idx) => (
               <button
                 key={l.code}

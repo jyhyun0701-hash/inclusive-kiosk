@@ -274,17 +274,16 @@ html, body {
   transition: background 0.15s;
   outline: none;
 }
-.cert-btn:hover { background: var(--blue-focus); }
+.cert-btn:hover         { background: var(--blue-focus); }
 .cert-btn.focused,
 .cert-btn:focus-visible { border-color: var(--yellow); box-shadow: 0 0 0 6px rgba(255,215,0,0.35); }
-.cert-btn.gray       { background: var(--gray-mid); color: var(--text); }
-.cert-btn.gray:hover { background: #b8b8b8; }
+.cert-btn.gray          { width: 600px; background: var(--gray-mid); color: var(--text); }
+.cert-btn.gray:hover    { background: #b8b8b8; }
 
 /* 언어 선택 */
 .lang-selector {
   display: flex;
-  justify-content: space-between;
-  padding: 40px 40px; /* 좌우 여백 */
+  gap: 65px;
 }
 .lang-btn {
   width: 200px; height: 200px;
@@ -828,27 +827,28 @@ html, body {
   align-items: center;
   justify-content: center;
   min-height: 100%;
-  gap: 60px;
 }
 
-/* ── IssuancePage: 발급 완료 내용 중앙 정렬 ──────────────────── */
+/* ── IssuancePage: 발급 완료 내용 ──────────────────── */
 .content-wrap-issuance {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
+  margin: 150px auto;
+  gap: 40px;
 }
 .content-wrap-issuance .status-card,
 .content-wrap-issuance .issue-table,
 .content-wrap-issuance .cert-btn {
   width: 100%;
-  max-width: 826px;
+  max-width: 790px;
 }
 .content-wrap-issuance .issue-table {
   margin: 24px 0;
 }
 
-/* ── IdentityVerificationPage: 본인확인 내용 중앙 정렬 ──────── */
+/* ── IdentityVerificationPage: 본인확인 내용 ──────── */
 .content-wrap-verify {
   display: flex;
   flex-direction: column;

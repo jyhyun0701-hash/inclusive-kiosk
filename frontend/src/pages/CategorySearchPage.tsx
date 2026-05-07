@@ -81,6 +81,22 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
       <main className="kiosk-content">
         {isMagnified && <NavPad onNavigate={navigate} />}
         <div ref={wrapRef} className="content-scroll-wrap">
+          <button
+               onClick={onSearchClick}
+               style={{
+                 position: 'absolute', bottom: '30px', right: '40px', zIndex: 50,
+                 height: '110px', padding: '0 36px',
+                 background: 'var(--gray-mid)', color: 'var(--text)',
+                 border: 'none', borderRadius: 'var(--r)',
+                 fontFamily: 'inherit', fontSize: 'var(--fs-btn-lg)', fontWeight: 700,
+                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px',
+                 whiteSpace: 'nowrap'
+               }}
+               aria-label="증명서 검색"
+             >
+               <img src={imgSearch} alt="search" />
+               증명서 검색
+             </button>
           <div ref={innerRef} className="content-wrap-category">
           {/* 섹션 헤더 */}
           <div className="section-label">
@@ -132,19 +148,6 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
               </div>
             </>
           )}
-
-          {/* 증명서 검색 전환 */}
-          <button
-            className="search-type-btn"
-            onClick={onSearchClick}
-            data-tabfocus="Y"
-            data-tabgroup="cat-bottom"
-            data-ttsmsg="증명서 검색"
-            tabIndex={0}
-          >
-            <img src={imgSearch} alt="search" />
-            증명서 검색
-          </button>
           </div>
         </div>
       </main>
