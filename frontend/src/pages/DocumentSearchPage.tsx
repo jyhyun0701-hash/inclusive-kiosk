@@ -5,9 +5,22 @@ import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import InfoModal from '../components/common/InfoModal';
-import KoreanKeyboard from '../components/common/keyboards/KoreanKeyboard';
 import imgSearch from '../assets/images/search.png';
+import imgDelete from '../assets/images/delete.png';
 import { type Language, type Certificate, ALL_CERTIFICATES } from '../types/kiosk';
+
+const KO_ROWS = [
+  ['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ'],
+  ['ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'],
+  ['ㅏ','ㅑ','ㅓ','ㅕ','ㅗ','ㅛ','ㅜ'],
+  ['ㅠ','ㅡ','ㅣ','ㅐ','ㅔ','ㅒ','ㅖ'],
+];
+const EN_ROWS = [
+  ['A','B','C','D','E','F','G'],
+  ['H','I','J','K','L','M','N'],
+  ['O','P','Q','R','S','T','U'],
+  ['V','W','X','Y','Z'],
+];
 
 interface DocumentSearchPageProps {
   language: Language;
@@ -47,6 +60,11 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
   const [query, setQuery] = useState('');
   const [confirmCert, setConfirmCert] = useState<Certificate | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [kbMode, setKbMode] = useState<'ko' | 'en'>('ko');
+
+  const kbRows = kbMode === 'ko' ? KO_ROWS : EN_ROWS;
+  const append = (ch: string) => setQuery(q => q + ch);
+  const backspace = () => setQuery(q => q.slice(0, -1));
   const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
 
   const results = useMemo<Certificate[]>(() => {
@@ -83,11 +101,35 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
           </div>
 
           {/* 키보드 */}
-          <KoreanKeyboard
-            value={query}
-            onChange={setQuery}
-            onCategorySearch={onCategorySearch}
-          />
+          <div className="keyboard-wrap">
+            {kbRows.map((row, ri) => (
+              <div className="keyboard-row" key={ri}>
+                {row.map((ch) => (
+                  <button
+                    key={ch}
+                    className="key-btn"
+                    onClick={() => append(ch)}
+                    aria-label={ch}
+                  >
+                    {ch}
+                  </button>
+                ))}
+              </div>
+            ))}
+            <div className="keyboard-actions">
+              <button className="kb-action-btn category" style={{ flex: 1 }} onClick={onCategorySearch}>
+                <img src={imgSearch} alt="search" />
+                카테고리 검색
+              </button>
+              <button className="kb-action-btn" style={{ flex: 1, background: 'var(--navy)', color: 'var(--white)' }} onClick={() => setKbMode(m => m === 'ko' ? 'en' : 'ko')}>
+                {kbMode === 'ko' ? 'English' : '한국어'}
+              </button>
+              <button className="kb-action-btn delete" style={{ flex: 1 }} onClick={backspace}>
+                <img src={imgDelete} alt="delete" />
+                지우기
+              </button>
+            </div>
+          </div>
 
           {/* 검색 결과 */}
           {query && results.length > 0 && (

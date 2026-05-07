@@ -453,7 +453,7 @@ html, body {
   border: 3px solid #ccc;
   border-radius: var(--r);
   padding: 22px 36px;
-  margin-bottom: 28px;
+  margin-bottom: 30px;
 }
 .search-bar .search-icon { font-size: 48px; color: #666; }
 .search-bar input {
@@ -470,13 +470,6 @@ html, body {
 .search-bar input::placeholder { color: #aaa; }
 
 /* 키보드 */
-.keyboard-wrap {
-  background: #1a2035;
-  border-radius: var(--r);
-  padding: 28px 24px;
-  margin-bottom: 28px;
-}
-
 .kb-mode-row {
   display: flex;
   justify-content: flex-end;
@@ -497,8 +490,8 @@ html, body {
 
 .keyboard-row {
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 30px;
+  margin-bottom: 30px;
   justify-content: center;
 }
 
@@ -506,12 +499,12 @@ html, body {
   flex: 1;
   height: 100px;
   min-width: 0;
-  background: var(--kbd-bg);
+  background: var(--navy);
   color: var(--white);
   border: none;
   border-radius: var(--r-sm);
   font-family: inherit;
-  font-size: var(--fs-key);
+  font-size: var(--fs-btn-lg);
   font-weight: 700;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -527,22 +520,25 @@ html, body {
   display: flex;
   justify-content: space-between;
   margin-top: 18px;
-  gap: 20px;
+  gap: 30px;
 }
 .kb-action-btn {
-  height: 92px;
-  padding: 0 40px;
+  width: 379px;
+  height: 110px;
+  padding: 0 20px;
   border: none;
   border-radius: var(--r-sm);
   font-family: inherit;
-  font-size: 30px;
+  font-size: var(--fs-btn-lg);
   font-weight: 700;
   cursor: pointer;
-  display: flex; align-items: center; gap: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   outline: none;
+  background-color: var(--gray-mid);
 }
-.kb-action-btn.category { background: var(--blue-btn); color: var(--white); }
-.kb-action-btn.delete   { background: var(--error);    color: var(--white); }
+.kb-action-btn.delete   { background: var(--navy); color: var(--white); gap: 35px;}
 .kb-action-btn:focus-visible { outline: 3px solid var(--yellow); }
 
 /* 검색 결과 */
@@ -572,15 +568,18 @@ html, body {
   text-align: center;
   color: #999;
   font-size: var(--fs-btn-md);
-  padding: 80px 0;
+  padding: 290px 0;
 }
 
 /* ──────────────────────────────────────────────
    12. 3. 본인 확인 — 주민번호 입력
    ────────────────────────────────────────────── */
 .id-display {
-  background: var(--gray-mid);
+  background: #f0f0f0;
+  border: 3px solid #ccc;
   border-radius: var(--r);
+  padding: 22px 36px;
+  margin-bottom: 28px;
   padding: 36px 44px;
   font-size: 52px;
   font-weight: 700;
@@ -674,11 +673,16 @@ html, body {
   border-radius: 20px;
 }
 .issue-table td {
-  padding: 30px 36px;
+  padding: 30px 50px;
   border-bottom: 2px solid #e0e0e0;
 }
+
+.issue-table td:last-child {
+  text-align: right;
+  font-weight: 700;
+}
+
 .issue-table td:first-child { color: #FFFFFF; font-weight: 600; }
-.issue-table td:last-child  { font-weight: 700; }
 
 /* ──────────────────────────────────────────────
    15. 모달
