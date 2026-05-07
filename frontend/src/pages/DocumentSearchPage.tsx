@@ -9,6 +9,62 @@ import imgSearch from '../assets/images/search.png';
 import imgDelete from '../assets/images/delete.png';
 import { type Language, type Certificate, ALL_CERTIFICATES } from '../types/kiosk';
 
+// ── 한글 IME ────────────────────────────────────────────────
+const CHOSUNG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const CHO_IDX: Record<string, number> = Object.fromEntries(CHOSUNG.map((c, i) => [c, i]));
+const JUNG_IDX: Record<string, number> = Object.fromEntries(
+  ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'].map((c, i) => [c, i])
+);
+const JONG_IDX: Record<string, number> = {
+  'ㄱ':1,'ㄲ':2,'ㄴ':4,'ㄷ':7,'ㄹ':8,'ㅁ':16,'ㅂ':17,'ㅅ':19,'ㅆ':20,'ㅇ':21,'ㅈ':22,'ㅊ':23,'ㅋ':24,'ㅌ':25,'ㅍ':26,'ㅎ':27,
+};
+// 종성 인덱스 → 초성 인덱스 (모음이 올 때 분리)
+const JONG_TO_CHO: Record<number, number> = {
+  1:0,2:1,4:2,7:3,8:5,16:6,17:7,19:9,20:10,21:11,22:12,23:14,24:15,25:16,26:17,27:18,
+};
+
+function makeSyl(cho: number, jung: number, jong = 0) {
+  return String.fromCharCode(0xAC00 + (cho * 21 + jung) * 28 + jong);
+}
+
+type KoState = { buf: string; cho: number | null; jung: number | null; jong: number | null };
+const KO_INIT: KoState = { buf: '', cho: null, jung: null, jong: null };
+
+function koStr({ buf, cho, jung, jong }: KoState): string {
+  if (cho === null) return buf;
+  if (jung === null) return buf + CHOSUNG[cho];
+  return buf + makeSyl(cho, jung, jong ?? 0);
+}
+
+function koAdd(s: KoState, ch: string): KoState {
+  if (ch in JUNG_IDX) {
+    const ji = JUNG_IDX[ch];
+    if (s.cho === null)         return { ...s, cho: 11, jung: ji, jong: null };           // 묵음 ㅇ
+    if (s.jung === null)        return { ...s, jung: ji };
+    if (s.jong === null)        return { buf: s.buf + makeSyl(s.cho, s.jung, 0), cho: 11, jung: ji, jong: null };
+    // 종성 분리: 현재 음절에서 종성 제거 → 종성이 다음 음절 초성이 됨
+    return { buf: s.buf + makeSyl(s.cho, s.jung, 0), cho: JONG_TO_CHO[s.jong], jung: ji, jong: null };
+  }
+  if (ch in CHO_IDX) {
+    const ci = CHO_IDX[ch];
+    const ni = JONG_IDX[ch] ?? 0;
+    if (s.cho === null)         return { ...s, cho: ci };
+    if (s.jung === null)        return { buf: s.buf + CHOSUNG[s.cho], cho: ci, jung: null, jong: null };
+    if (s.jong === null && ni)  return { ...s, jong: ni };
+    const fin = s.jong != null ? makeSyl(s.cho, s.jung, s.jong) : makeSyl(s.cho, s.jung, 0);
+    return { buf: s.buf + fin, cho: ci, jung: null, jong: null };
+  }
+  return { buf: koStr(s) + ch, cho: null, jung: null, jong: null };
+}
+
+function koDel(s: KoState): KoState {
+  if (s.jong !== null) return { ...s, jong: null };
+  if (s.jung !== null) return { ...s, jung: null };
+  if (s.cho  !== null) return { ...s, cho: null };
+  return { ...s, buf: s.buf.slice(0, -1) };
+}
+// ── end 한글 IME ────────────────────────────────────────────
+
 const KO_ROWS = [
   ['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ'],
   ['ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'],
@@ -57,14 +113,29 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
   onHome, onToggleTts, onToggleMagnify,
   onCertificateConfirmed, onCategorySearch,
 }) => {
-  const [query, setQuery] = useState('');
+  const [koState, setKoState] = useState<KoState>(KO_INIT);
+  const [enQuery, setEnQuery] = useState('');
   const [confirmCert, setConfirmCert] = useState<Certificate | null>(null);
   const [showInfo, setShowInfo] = useState(false);
   const [kbMode, setKbMode] = useState<'ko' | 'en'>('ko');
 
   const kbRows = kbMode === 'ko' ? KO_ROWS : EN_ROWS;
-  const append = (ch: string) => setQuery(q => q + ch);
-  const backspace = () => setQuery(q => q.slice(0, -1));
+  const query = kbMode === 'ko' ? koStr(koState) : enQuery;
+
+  const append = (ch: string) => {
+    if (kbMode === 'ko') setKoState(s => koAdd(s, ch));
+    else setEnQuery(q => q + ch);
+  };
+  const backspace = () => {
+    if (kbMode === 'ko') setKoState(s => koDel(s));
+    else setEnQuery(q => q.slice(0, -1));
+  };
+  const switchMode = () => {
+    setKoState(KO_INIT);
+    setEnQuery('');
+    setKbMode(m => m === 'ko' ? 'en' : 'ko');
+  };
+
   const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
 
   const results = useMemo<Certificate[]>(() => {
@@ -121,7 +192,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
                 <img src={imgSearch} alt="search" />
                 카테고리 검색
               </button>
-              <button className="kb-action-btn" style={{ flex: 1, background: 'var(--navy)', color: 'var(--white)' }} onClick={() => setKbMode(m => m === 'ko' ? 'en' : 'ko')}>
+              <button className="kb-action-btn" style={{ flex: 1, background: 'var(--navy)', color: 'var(--white)' }} onClick={switchMode}>
                 {kbMode === 'ko' ? 'English' : '한국어'}
               </button>
               <button className="kb-action-btn delete" style={{ flex: 1 }} onClick={backspace}>
