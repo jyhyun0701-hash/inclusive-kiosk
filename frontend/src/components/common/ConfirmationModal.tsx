@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import type { Certificate, Language } from '../../types/kiosk';
+import imgPopupInfo from  '../../assets/images/popup-info.png';
 
 interface ConfirmationModalProps {
   certificate: Certificate;
@@ -63,31 +64,33 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       aria-labelledby="modal-title"
     >
       <div className="modal-box">
-        <div className="modal-title" id="modal-title">
-          <span>ℹ️</span>
+        <div className="modal-title-box" id="modal-title">
+          <img src={imgPopupInfo} alt="imgPopupInfo"/>
           <span>{l.title}</span>
         </div>
-        <div className="modal-body">
-          {l.body(certificate.nameKo).split('\n').map((line, i) => (
-            <p key={i}>{i === 0 ? <strong>{line}</strong> : line}</p>
-          ))}
-        </div>
-        <div className="modal-actions">
-          <button
-            ref={confirmRef}
-            className="modal-btn confirm"
-            onClick={onConfirm}
-            aria-label={`${l.confirm} - ${certificate.nameKo}`}
-          >
-            {l.confirm}
-          </button>
-          <button
-            className="modal-btn cancel"
-            onClick={onCancel}
-            aria-label={l.cancel}
-          >
-            {l.cancel}
-          </button>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', padding: '48px 60px' }}>
+          <div className="modal-body">
+            {l.body(certificate.nameKo).split('\n').map((line, i) => (
+              <p key={i}>{i === 0 ? <strong>{line}</strong> : line}</p>
+            ))}
+          </div>
+          <div className="modal-actions">
+            <button
+              ref={confirmRef}
+              className="modal-btn confirm"
+              onClick={onConfirm}
+              aria-label={`${l.confirm} - ${certificate.nameKo}`}
+            >
+              {l.confirm}
+            </button>
+            <button
+              className="modal-btn cancel"
+              onClick={onCancel}
+              aria-label={l.cancel}
+            >
+              {l.cancel}
+            </button>
+          </div>
         </div>
       </div>
     </div>
