@@ -102,9 +102,9 @@ const IdentityVerificationPage: React.FC<Props> = ({
       <main className="kiosk-content content-verify">
         {isMagnified && <NavPad onNavigate={navigate} />}
         <div ref={wrapRef} className="content-scroll-wrap">
-          <div ref={innerRef} className="content-wrap-verify">
+          <div ref={innerRef} className="content-wrap-verify" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
           {step === 'id-input' && (
-            <>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               {/* 입력값 표시 */}
               <div className={`id-display${!id ? ' empty' : ''}`}>
                 {id ? (
@@ -121,22 +121,24 @@ const IdentityVerificationPage: React.FC<Props> = ({
                 onConfirm={() => id.length === 13 && setStep('fp-wait')}
                 maxLength={13}
               />
-            </>
+            </div>
           )}
 
           {step === 'fp-wait' && (
-            <div className="fingerprint-area">
-              <div className="status-card info" style={{ width: '100%' }}>
-                지문 입력기에 엄지 손가락을 올려주십시오.
-              </div>
-              <div className="fingerprint-icon">
-                <img src={imgFPScan} alt="scan"/>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="fingerprint-area">
+                <div className="status-card info" style={{ width: '100%' }}>
+                  지문 입력기에 엄지 손가락을 올려주십시오.
+                </div>
+                <div className="fingerprint-icon">
+                  <img src={imgFPScan} alt="scan"/>
+                </div>
               </div>
             </div>
           )}
 
           {step === 'fp-fail' && (
-            <>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <div className="status-card error">
                 지문 인식에 실패했습니다.
                 손가락이 건조하거나, 손가락 위치가 맞지 않으면 인식에 실패합니다. 손가락을 다시 올려주세요.
@@ -157,16 +159,18 @@ const IdentityVerificationPage: React.FC<Props> = ({
                   다시 시도
                 </button>
               </div>
-            </>
+            </div>
           )}
 
           {step === 'fp-ok' && (
-            <div className="fingerprint-area">
-              <div className="status-card success" style={{ width: '100%' }}>
-                지문 인식에 성공하였습니다.
-              </div>
-              <div className="fingerprint-icon">
-                <img src={imgFPSuccess} alt="success"/>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="fingerprint-area">
+                <div className="status-card success" style={{ width: '100%' }}>
+                  지문 인식에 성공하였습니다.
+                </div>
+                <div className="fingerprint-icon">
+                  <img src={imgFPSuccess} alt="success"/>
+                </div>
               </div>
             </div>
           )}
