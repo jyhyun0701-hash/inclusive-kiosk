@@ -836,6 +836,13 @@ html, body {
   overflow: hidden;
 }
 
+/* ── CategorySearchPage: 카테고리 검색 내용 ──────────── */
+.content-wrap-category {
+  position: relative;
+  width: 100%;
+  padding-bottom: 190px; /* 우하단 absolute 버튼 공간 확보 */
+}
+
 /* ── IssuancePage: 발급 완료 내용 ──────────────────── */
 .content-wrap-issuance {
   display: flex;
