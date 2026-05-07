@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import { useMagnify } from '../hooks/useMagnify';
+import NavPad from '../components/common/NavPad';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import ConfirmationModal from '../components/common/ConfirmationModal';
@@ -45,6 +47,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
   const [query, setQuery] = useState('');
   const [confirmCert, setConfirmCert] = useState<Certificate | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
 
   const results = useMemo<Certificate[]>(() => {
     if (!query.trim()) return [];
@@ -62,49 +65,54 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
       </header>
 
       <main className="kiosk-content">
-        {/* 검색창 */}
-        <div className="search-bar">
-          <span className="search-icon">
-            <img src={imgSearch} alt="search"/>
-          </span>
-          <input
-            type="text"
-            value={query}
-            readOnly
-            placeholder={PLACEHOLDER[language]}
-            aria-label="증명서 검색"
-          />
-        </div>
-
-        {/* 키보드 */}
-        <KoreanKeyboard
-          value={query}
-          onChange={setQuery}
-          onCategorySearch={onCategorySearch}
-        />
-
-        {/* 검색 결과 */}
-        {query && results.length > 0 && (
-          <div className="search-results">
-            {results.map((cert, idx) => (
-              <button
-                key={cert.id}
-                className="search-result-btn"
-                onClick={() => setConfirmCert(cert)}
-                aria-label={cert.nameKo}
-                data-tabfocus="Y"
-                data-tabgroup="doc-search"
-                data-ttsmsg={cert.nameKo}
-                tabIndex={idx}
-              >
-                {cert.nameKo}
-              </button>
-            ))}
+        {isMagnified && <NavPad onNavigate={navigate} />}
+        <div ref={wrapRef} className="content-scroll-wrap">
+          <div ref={innerRef}>
+          {/* 검색창 */}
+          <div className="search-bar">
+            <span className="search-icon">
+              <img src={imgSearch} alt="search"/>
+            </span>
+            <input
+              type="text"
+              value={query}
+              readOnly
+              placeholder={PLACEHOLDER[language]}
+              aria-label="증명서 검색"
+            />
           </div>
-        )}
-        {query && results.length === 0 && (
-          <div className="no-results">{NO_RESULT[language]}</div>
-        )}
+
+          {/* 키보드 */}
+          <KoreanKeyboard
+            value={query}
+            onChange={setQuery}
+            onCategorySearch={onCategorySearch}
+          />
+
+          {/* 검색 결과 */}
+          {query && results.length > 0 && (
+            <div className="search-results">
+              {results.map((cert, idx) => (
+                <button
+                  key={cert.id}
+                  className="search-result-btn"
+                  onClick={() => setConfirmCert(cert)}
+                  aria-label={cert.nameKo}
+                  data-tabfocus="Y"
+                  data-tabgroup="doc-search"
+                  data-ttsmsg={cert.nameKo}
+                  tabIndex={idx}
+                >
+                  {cert.nameKo}
+                </button>
+              ))}
+            </div>
+          )}
+          {query && results.length === 0 && (
+            <div className="no-results">{NO_RESULT[language]}</div>
+          )}
+          </div>
+        </div>
       </main>
 
       {confirmCert && (

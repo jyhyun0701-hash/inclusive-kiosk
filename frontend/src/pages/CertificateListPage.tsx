@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useMagnify } from '../hooks/useMagnify';
+import NavPad from '../components/common/NavPad';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import InfoModal from '../components/common/InfoModal';
@@ -36,6 +38,7 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
   onCategorySearchClick, onCertificateSelect, onSearchClick,
 }) => {
   const [showInfo, setShowInfo] = useState(false);
+  const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
 
   return (
     <div className="kiosk-root">
@@ -45,48 +48,53 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
       </header>
 
       <main className="kiosk-content">
-        {/* 상단 검색 타입 2버튼 */}
-        <div className="search-type-row">
-          <button
-            className="search-type-btn"
-            onClick={onCategorySearchClick}
-            data-tabfocus="Y"
-            data-tabgroup="cert-list-top"
-            data-ttsmsg={LABEL_CATEGORY[language]}
-            tabIndex={0}
-          >
-             <img src={imgSearch} alt="search" />
-             {LABEL_CATEGORY[language]}
-          </button>
-          <button
-            className="search-type-btn"
-            onClick={onSearchClick}
-            data-tabfocus="Y"
-            data-tabgroup="cert-list-top"
-            data-ttsmsg={LABEL_SEARCH[language]}
-            tabIndex={1}
-          >
-            <img src={imgSearch} alt="search" />
-            {LABEL_SEARCH[language]}
-          </button>
-        </div>
-
-        {/* 전체 증명서 그리드 */}
-        <div className="all-category-grid">
-          {ALL_CERTIFICATES.map((cert, idx) => (
+        {isMagnified && <NavPad onNavigate={navigate} />}
+        <div ref={wrapRef} className="content-scroll-wrap">
+          <div ref={innerRef}>
+          {/* 상단 검색 타입 2버튼 */}
+          <div className="search-type-row">
             <button
-              key={cert.id}
-              className="all-category-btn"
-              onClick={() => onCertificateSelect(cert)}
-              aria-label={cert.nameKo}
+              className="search-type-btn"
+              onClick={onCategorySearchClick}
               data-tabfocus="Y"
-              data-tabgroup="cert-list"
-              data-ttsmsg={cert.nameKo}
-              tabIndex={idx}
+              data-tabgroup="cert-list-top"
+              data-ttsmsg={LABEL_CATEGORY[language]}
+              tabIndex={0}
             >
-              {cert.nameKo}
+               <img src={imgSearch} alt="search" />
+               {LABEL_CATEGORY[language]}
             </button>
-          ))}
+            <button
+              className="search-type-btn"
+              onClick={onSearchClick}
+              data-tabfocus="Y"
+              data-tabgroup="cert-list-top"
+              data-ttsmsg={LABEL_SEARCH[language]}
+              tabIndex={1}
+            >
+              <img src={imgSearch} alt="search" />
+              {LABEL_SEARCH[language]}
+            </button>
+          </div>
+
+          {/* 전체 증명서 그리드 */}
+          <div className="all-category-grid">
+            {ALL_CERTIFICATES.map((cert, idx) => (
+              <button
+                key={cert.id}
+                className="all-category-btn"
+                onClick={() => onCertificateSelect(cert)}
+                aria-label={cert.nameKo}
+                data-tabfocus="Y"
+                data-tabgroup="cert-list"
+                data-ttsmsg={cert.nameKo}
+                tabIndex={idx}
+              >
+                {cert.nameKo}
+              </button>
+            ))}
+          </div>
+          </div>
         </div>
       </main>
 

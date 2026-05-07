@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useMagnify } from '../hooks/useMagnify';
+import NavPad from '../components/common/NavPad';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import Layout from '../components/common/Layout';

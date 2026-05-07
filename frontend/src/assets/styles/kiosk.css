@@ -797,3 +797,83 @@ html, body {
   50%       { opacity: 0.3; }
 }
 .printing .fingerprint-icon { animation: blink 1.2s ease-in-out infinite; }
+
+.kiosk-content {
+  position: relative;
+  overflow: hidden;       /* content-scroll-wrap 안에서만 스크롤 */
+}
+
+/* ── content-scroll-wrap: 실제 스크롤 컨테이너 ─────────────────
+   kiosk-content 의 직접 자식 div.
+   isMagnified 시 useMagnify hook 이 overflow:scroll 로 변경.
+   스크롤바는 숨김 (nav 버튼으로만 이동).
+   ─────────────────────────────────────────────────────────────── */
+.content-scroll-wrap {
+  width: 100%;
+  height: 100%;
+  overflow: auto;              /* 기본: 세로 스크롤 허용 */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.content-scroll-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── NavPad 공통 ─────────────────────────────────────────────── */
+.nav-pad {
+  position: absolute;
+  z-index: 100;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-pad img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.nav-pad:active { opacity: 0.75; }
+
+/* 위 — 상단 중앙 */
+.nav-pad--up {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 105px;
+  height: 105px;
+}
+
+/* 아래 — 하단 중앙 */
+.nav-pad--down {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 105px;
+  height: 105px;
+}
+
+/* 왼쪽 */
+.nav-pad--left {
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 105px;
+  height: 105px;
+}
+
+/* 오른쪽 */
+.nav-pad--right {
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 105px;
+  height: 105px;
+}

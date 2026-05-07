@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useMagnify } from '../hooks/useMagnify';
+import NavPad from '../components/common/NavPad';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import InfoModal from '../components/common/InfoModal';
@@ -62,6 +64,7 @@ const IdentityVerificationPage: React.FC<Props> = ({
   onHome, onToggleTts, onToggleMagnify, onVerified,
 }) => {
   const fm = useFocusManagerContext();
+  const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
   const [step, setStep] = useState<VerifyStep>('id-input');
   const [id, setId] = useState('');
   const [showInfo, setShowInfo] = useState(false);
@@ -97,73 +100,78 @@ const IdentityVerificationPage: React.FC<Props> = ({
       </header>
 
       <main className="kiosk-content content-verify">
-        {step === 'id-input' && (
-          <>
-            {/* 입력값 표시 */}
-            <div className={`id-display${!id ? ' empty' : ''}`}>
-              {id ? (
-                  formatId(id)
-                ) : (
-                  <>
-                    주민번호를 입력하십시오. 예) 901010-1234567
-                  </>
-                )}
-            </div>
-            <NumPad
-              value={id}
-              onChange={setId}
-              onConfirm={() => id.length === 13 && setStep('fp-wait')}
-              maxLength={13}
-            />
-          </>
-        )}
+        {isMagnified && <NavPad onNavigate={navigate} />}
+        <div ref={wrapRef} className="content-scroll-wrap">
+          <div ref={innerRef}>
+          {step === 'id-input' && (
+            <>
+              {/* 입력값 표시 */}
+              <div className={`id-display${!id ? ' empty' : ''}`}>
+                {id ? (
+                    formatId(id)
+                  ) : (
+                    <>
+                      주민번호를 입력하십시오. 예) 901010-1234567
+                    </>
+                  )}
+              </div>
+              <NumPad
+                value={id}
+                onChange={setId}
+                onConfirm={() => id.length === 13 && setStep('fp-wait')}
+                maxLength={13}
+              />
+            </>
+          )}
 
-        {step === 'fp-wait' && (
-          <div className="fingerprint-area">
-            <div className="fingerprint-icon">
-              <img src={imgFPScan} alt="scan"/>
-            </div>
-            <div className="status-card info" style={{ width: '100%' }}>
-              지문 입력기에 엄지 손가락을 올려주십시오.
-            </div>
-          </div>
-        )}
-
-        {step === 'fp-fail' && (
-          <>
-            <div className="status-card error">
-              지문 인식에 실패했습니다.
-              손가락이 건조하거나, 손가락 위치가 맞지 않으면 인식에 실패합니다. 손가락을 다시 올려주세요.
-            </div>
+          {step === 'fp-wait' && (
             <div className="fingerprint-area">
               <div className="fingerprint-icon">
-               <img src={imgFPFail} alt="fail"/>
+                <img src={imgFPScan} alt="scan"/>
               </div>
-              <button
-                className="cert-btn gray"
-                style={{ maxWidth: 500 }}
-                onClick={() => setStep('fp-wait')}
-                data-tabfocus="Y"
-                data-tabgroup="identity"
-                data-ttsmsg="다시 시도"
-                tabIndex={0}
-              >
-                다시 시도
-              </button>
+              <div className="status-card info" style={{ width: '100%' }}>
+                지문 입력기에 엄지 손가락을 올려주십시오.
+              </div>
             </div>
-          </>
-        )}
+          )}
 
-        {step === 'fp-ok' && (
-          <div className="fingerprint-area">
-            <div className="status-card success" style={{ width: '100%' }}>
-              지문 인식에 성공하였습니다.
+          {step === 'fp-fail' && (
+            <>
+              <div className="status-card error">
+                지문 인식에 실패했습니다.
+                손가락이 건조하거나, 손가락 위치가 맞지 않으면 인식에 실패합니다. 손가락을 다시 올려주세요.
+              </div>
+              <div className="fingerprint-area">
+                <div className="fingerprint-icon">
+                 <img src={imgFPFail} alt="fail"/>
+                </div>
+                <button
+                  className="cert-btn gray"
+                  style={{ maxWidth: 500 }}
+                  onClick={() => setStep('fp-wait')}
+                  data-tabfocus="Y"
+                  data-tabgroup="identity"
+                  data-ttsmsg="다시 시도"
+                  tabIndex={0}
+                >
+                  다시 시도
+                </button>
+              </div>
+            </>
+          )}
+
+          {step === 'fp-ok' && (
+            <div className="fingerprint-area">
+              <div className="status-card success" style={{ width: '100%' }}>
+                지문 인식에 성공하였습니다.
+              </div>
+              <div className="fingerprint-icon">
+                <img src={imgFPSuccess} alt="success"/>
+              </div>
             </div>
-            <div className="fingerprint-icon">
-              <img src={imgFPSuccess} alt="success"/>
-            </div>
+          )}
           </div>
-        )}
+        </div>
       </main>
 
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}

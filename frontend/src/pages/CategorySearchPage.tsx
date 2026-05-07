@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useMagnify } from '../hooks/useMagnify';
+import NavPad from '../components/common/NavPad';
 import { useFocusManagerContext } from '../context/FocusManagerContext';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
@@ -36,6 +38,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
   onCertificateConfirmed, onSearchClick,
 }) => {
   const fm = useFocusManagerContext();
+  const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
   const [selectedCategory, setSelectedCategory] = useState<CertificateCategory | null>(
     initialCategory ?? null
   );
@@ -76,69 +79,74 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
       </header>
 
       <main className="kiosk-content">
-        {/* 섹션 헤더 */}
-        <div className="section-label">
-          <span>증명서 카테고리</span>
-          <img src={imgCategory} alt="category" />
+        {isMagnified && <NavPad onNavigate={navigate} />}
+        <div ref={wrapRef} className="content-scroll-wrap">
+          <div ref={innerRef}>
+          {/* 섹션 헤더 */}
+          <div className="section-label">
+            <span>증명서 카테고리</span>
+            <img src={imgCategory} alt="category" />
+          </div>
+
+          {/* 6개 카테고리 3×2 그리드 */}
+          <div className="category-grid-6">
+            {CATEGORY_TABS.map((cat, idx) => (
+              <button
+                key={cat}
+                className={`category-btn-6${selectedCategory === cat ? ' selected' : ''}`}
+                onClick={() => handleCategoryClick(cat)}
+                aria-pressed={selectedCategory === cat}
+                aria-label={cat}
+                data-tabfocus="Y"
+                data-tabgroup="category"
+                data-ttsmsg={cat}
+                tabIndex={idx}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* 선택된 카테고리 하위 목록 */}
+          {selectedCategory && subCerts.length > 0 && (
+            <>
+              <div className="section-label">
+                <span>선택한 카테고리 목록</span>
+                <img src={imgCategory} alt="category" />
+              </div>
+              <div className="sub-cert-grid">
+                {subCerts.map((cert, idx) => (
+                  <button
+                    key={cert.id}
+                    className={`sub-cert-btn${highlightedCertId === cert.id ? ' selected' : ''}`}
+                    onClick={() => handleCertClick(cert)}
+                    aria-label={cert.nameKo}
+                    data-tabfocus="Y"
+                    data-tabgroup="sub-cert"
+                    data-ttsmsg={cert.nameKo}
+                    tabIndex={idx}
+                  >
+                    {cert.nameKo}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* 증명서 검색 전환 */}
+          <button
+            className="search-type-btn"
+            onClick={onSearchClick}
+            data-tabfocus="Y"
+            data-tabgroup="cat-bottom"
+            data-ttsmsg="증명서 검색"
+            tabIndex={0}
+          >
+            <img src={imgSearch} alt="search" />
+            증명서 검색
+          </button>
+          </div>
         </div>
-
-        {/* 6개 카테고리 3×2 그리드 */}
-        <div className="category-grid-6">
-          {CATEGORY_TABS.map((cat, idx) => (
-            <button
-              key={cat}
-              className={`category-btn-6${selectedCategory === cat ? ' selected' : ''}`}
-              onClick={() => handleCategoryClick(cat)}
-              aria-pressed={selectedCategory === cat}
-              aria-label={cat}
-              data-tabfocus="Y"
-              data-tabgroup="category"
-              data-ttsmsg={cat}
-              tabIndex={idx}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* 선택된 카테고리 하위 목록 */}
-        {selectedCategory && subCerts.length > 0 && (
-          <>
-            <div className="section-label">
-              <span>선택한 카테고리 목록</span>
-              <img src={imgCategory} alt="category" />
-            </div>
-            <div className="sub-cert-grid">
-              {subCerts.map((cert, idx) => (
-                <button
-                  key={cert.id}
-                  className={`sub-cert-btn${highlightedCertId === cert.id ? ' selected' : ''}`}
-                  onClick={() => handleCertClick(cert)}
-                  aria-label={cert.nameKo}
-                  data-tabfocus="Y"
-                  data-tabgroup="sub-cert"
-                  data-ttsmsg={cert.nameKo}
-                  tabIndex={idx}
-                >
-                  {cert.nameKo}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* 증명서 검색 전환 */}
-        <button
-          className="search-type-btn"
-          onClick={onSearchClick}
-          data-tabfocus="Y"
-          data-tabgroup="cat-bottom"
-          data-ttsmsg="증명서 검색"
-          tabIndex={0}
-        >
-          <img src={imgSearch} alt="search" />
-          증명서 검색
-        </button>
       </main>
 
       {confirmCert && (

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useMagnify } from '../hooks/useMagnify';
+import NavPad from '../components/common/NavPad';
 import styled from "styled-components";
 import Layout from "../components/common/Layout";
 import Modal from "../components/common/Modal";

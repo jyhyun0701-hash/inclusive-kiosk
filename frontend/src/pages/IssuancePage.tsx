@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useMagnify } from '../hooks/useMagnify';
+import NavPad from '../components/common/NavPad';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import type { Language, Certificate } from '../types/kiosk';
@@ -43,6 +45,7 @@ const IssuancePage: React.FC<Props> = ({
 }) => {
   const [step, setStep] = useState<IssueStep>('preparing');
   const [receiptPrinted, setReceiptPrinted] = useState(false);
+  const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
 
   useEffect(() => {
     const t1 = setTimeout(() => setStep('printing'), 2000);
@@ -58,56 +61,61 @@ const IssuancePage: React.FC<Props> = ({
       </header>
 
       <main className="kiosk-content content-verify">
-        {step !== 'done' ? (
-          <div className={`fingerprint-area${step === 'printing' ? ' printing' : ''}`}>
-            <div className="status-card printing" style={{ width: '100%' }}>
-              {step === 'preparing' ? '문서 출력을 준비하고 있습니다.' : '문서가 출력되고 있습니다.'}
+        {isMagnified && <NavPad onNavigate={navigate} />}
+        <div ref={wrapRef} className="content-scroll-wrap">
+          <div ref={innerRef}>
+          {step !== 'done' ? (
+            <div className={`fingerprint-area${step === 'printing' ? ' printing' : ''}`}>
+              <div className="status-card printing" style={{ width: '100%' }}>
+                {step === 'preparing' ? '문서 출력을 준비하고 있습니다.' : '문서가 출력되고 있습니다.'}
+              </div>
+              <div className="fingerprint-icon">
+                <img src={imgPrint} alt="print" />
+              </div>
             </div>
-            <div className="fingerprint-icon">
-              <img src={imgPrint} alt="print" />
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="status-card done">발급이 완료되었습니다.</div>
-            <table className="issue-table">
-              <tbody>
-                <tr><td>발급 서류</td><td>{certificate.nameKo}</td></tr>
-                <tr><td>수수료</td><td>{certificate.fee.toLocaleString()}원</td></tr>
-              </tbody>
-            </table>
+          ) : (
+            <>
+              <div className="status-card done">발급이 완료되었습니다.</div>
+              <table className="issue-table">
+                <tbody>
+                  <tr><td>발급 서류</td><td>{certificate.nameKo}</td></tr>
+                  <tr><td>수수료</td><td>{certificate.fee.toLocaleString()}원</td></tr>
+                </tbody>
+              </table>
 
-            {!receiptPrinted ? (
+              {!receiptPrinted ? (
+                <button
+                  className="cert-btn gray"
+                  style={{ marginTop: 24 }}
+                  onClick={() => setReceiptPrinted(true)}
+                  data-tabfocus="Y"
+                  data-tabgroup="issuance"
+                  data-ttsmsg="영수증 발급"
+                  tabIndex={0}
+                >
+                  영수증 발급
+                </button>
+              ) : (
+                <div className="status-card success" style={{ marginTop: 24 }}>
+                  영수증이 출력되었습니다.
+                </div>
+              )}
+
               <button
-                className="cert-btn gray"
-                style={{ marginTop: 24 }}
-                onClick={() => setReceiptPrinted(true)}
+                className="cert-btn"
+                style={{ marginTop: 50 }}
+                onClick={onHome}
                 data-tabfocus="Y"
                 data-tabgroup="issuance"
-                data-ttsmsg="영수증 발급"
-                tabIndex={0}
+                data-ttsmsg="처음으로 돌아가기"
+                tabIndex={receiptPrinted ? 0 : 1}
               >
-                영수증 발급
+                처음으로 돌아가기
               </button>
-            ) : (
-              <div className="status-card success" style={{ marginTop: 24 }}>
-                영수증이 출력되었습니다.
-              </div>
-            )}
-
-            <button
-              className="cert-btn"
-              style={{ marginTop: 24 }}
-              onClick={onHome}
-              data-tabfocus="Y"
-              data-tabgroup="issuance"
-              data-ttsmsg="처음으로 돌아가기"
-              tabIndex={receiptPrinted ? 0 : 1}
-            >
-              처음으로 돌아가기
-            </button>
-          </>
-        )}
+            </>
+          )}
+          </div>
+        </div>
       </main>
 
       <BottomBar

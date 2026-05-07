@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useMagnify } from '../hooks/useMagnify';
+import NavPad from '../components/common/NavPad';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import InfoModal from '../components/common/InfoModal';
@@ -45,6 +47,7 @@ const MainPage: React.FC<MainPageProps> = ({
   onToggleTts, onToggleMagnify,
 }) => {
   const [showInfo, setShowInfo] = useState(false);
+  const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
 
   return (
     <div className="kiosk-root">
@@ -53,45 +56,43 @@ const MainPage: React.FC<MainPageProps> = ({
         <div className="header-title">{HEADER[language]}</div>
       </header>
 
-      {isMagnified && (
-        <>
-          <button className="nav-arrow left" aria-label="왼쪽">‹</button>
-          <button className="nav-arrow right" aria-label="오른쪽">›</button>
-        </>
-      )}
-
       <main className="kiosk-content content-verify">
-        <div className="section-title">
-          <span className="star">★</span>
-          <span>{QUICK_LABEL[language]}</span>
-        </div>
+        {isMagnified && <NavPad onNavigate={navigate} />}
+        <div ref={wrapRef} className="content-scroll-wrap">
+          <div ref={innerRef}>
+          <div className="section-title">
+            <span className="star">★</span>
+            <span>{QUICK_LABEL[language]}</span>
+          </div>
 
-        <div className="cert-list">
-          {QUICK_CERTIFICATES.map((cert, idx) => (
+          <div className="cert-list">
+            {QUICK_CERTIFICATES.map((cert, idx) => (
+              <button
+                key={cert.id}
+                className="cert-btn"
+                onClick={() => onCertificateSelect(cert.id)}
+                aria-label={cert.nameKo}
+                data-tabfocus="Y"
+                data-tabgroup="main"
+                data-ttsmsg={cert.nameKo}
+                tabIndex={idx}
+              >
+                {language === 'ko' ? cert.nameKo : (cert.nameEn ?? cert.nameKo)}
+              </button>
+            ))}
             <button
-              key={cert.id}
-              className="cert-btn"
-              onClick={() => onCertificateSelect(cert.id)}
-              aria-label={cert.nameKo}
-              data-tabfocus="Y"
+              className="cert-btn gray"
+              onClick={onMoreCertificates}
+              aria-label={MORE_LABEL[language]}
+              data-tabfocus= "Y"
               data-tabgroup="main"
-              data-ttsmsg={cert.nameKo}
-              tabIndex={idx}
+              data-ttsmsg={MORE_LABEL[language]}
+              tabIndex={QUICK_CERTIFICATES.length}
             >
-              {language === 'ko' ? cert.nameKo : (cert.nameEn ?? cert.nameKo)}
+              {MORE_LABEL[language]}
             </button>
-          ))}
-          <button
-            className="cert-btn gray"
-            onClick={onMoreCertificates}
-            aria-label={MORE_LABEL[language]}
-            data-tabfocus= "Y"
-            data-tabgroup="main"
-            data-ttsmsg={MORE_LABEL[language]}
-            tabIndex={QUICK_CERTIFICATES.length}
-          >
-            {MORE_LABEL[language]}
-          </button>
+          </div>
+          </div>
         </div>
       </main>
 
