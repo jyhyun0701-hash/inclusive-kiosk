@@ -911,7 +911,7 @@ html, body {
 
 /* 위 */
 .nav-pad--up {
-  top: 20px;
+  top: 30px;
   left: 50%;
   transform: translateX(-50%);
   width: 105px;
@@ -920,7 +920,7 @@ html, body {
 
 /* 아래 */
 .nav-pad--down {
-  bottom: 20px;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
   width: 105px;
@@ -929,7 +929,7 @@ html, body {
 
 /* 왼쪽 */
 .nav-pad--left {
-  left: 20px;
+  left: 30px;
   top: 50%;
   transform: translateY(-50%);
   width: 105px;
@@ -938,7 +938,7 @@ html, body {
 
 /* 오른쪽 */
 .nav-pad--right {
-  right: 20px;
+  right: 30px;
   top: 50%;
   transform: translateY(-50%);
   width: 105px;
