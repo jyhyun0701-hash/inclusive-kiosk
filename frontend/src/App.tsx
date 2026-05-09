@@ -196,7 +196,19 @@ const closeKeypad = useCallback(() => {
       case 'NAVENTER':    (document.activeElement as HTMLElement)?.click(); break;
       case 'KEY_CANCEL':  goHome(); break;
       case 'KEY_LISTEN':  fm.readCurrentFocus(); break;
-      default: break;
+      case 'KEY_CORRECT': {
+        // numpad의 del 버튼 (tabIndex=9) 클릭
+        const delBtn = document.querySelector<HTMLElement>('[data-tabgroup="numpad"][tabindex="9"]');
+        if (delBtn) { delBtn.click(); fm.playTtsFromElement(delBtn); }
+        break;
+      }
+      default:
+        // 숫자 키 0-9: numpad가 렌더링된 경우에만 해당 버튼 클릭
+        if (/^[0-9]$/.test(key)) {
+          const numBtn = document.querySelector<HTMLElement>(`[data-tabgroup="numpad"][data-ttsmsg="${key}"]`);
+          if (numBtn) { numBtn.click(); fm.playTtsFromElement(numBtn); }
+        }
+        break;
     }
   }, [fm, goHome]);
 

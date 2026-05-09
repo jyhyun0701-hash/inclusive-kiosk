@@ -7,6 +7,7 @@ import InfoModal from '../components/common/InfoModal';
 import NumPad from './../components/common/keyboards/NumPad';
 import type { Language, Certificate } from '../types/kiosk';
 import { useFocusManagerContext } from '../context/FocusManagerContext';
+import { speakSafe } from '../utils/speakSafe';
 import imgFPSuccess from '../assets/images/fingerprint-success.png';
 import imgFPFail from '../assets/images/fingerprint-fail.png';
 import imgFPScan from '../assets/images/fingerprint-scan.png';
@@ -57,6 +58,13 @@ const RETRY_LABEL: Record<Language, string> = {
   en: 'Try Again',
   ja: 'もう一度',
   zh: '重试',
+};
+
+const ID_INCOMPLETE: Record<Language, string> = {
+  ko: '주민번호 13자리가 모두 입력되지 않았습니다.',
+  en: 'Please enter all 13 digits of your ID number.',
+  ja: '住民番号13桁が全て入力されていません。',
+  zh: '居民号码13位未全部输入。',
 };
 
 const HEADER: Record<VerifyStep, Record<Language, string>> = {
@@ -115,6 +123,11 @@ const IdentityVerificationPage: React.FC<Props> = ({
     }
   }, [step, isTtsOn]);
 
+  // 13자리 입력 완료 시 자동으로 지문 인식 단계로 진행
+  useEffect(() => {
+    if (step === 'id-input' && id.length === 13) setStep('fp-wait');
+  }, [id, step]);
+
   // 지문 시뮬레이션
   useEffect(() => {
     if (step === 'fp-wait') {
@@ -147,7 +160,7 @@ const IdentityVerificationPage: React.FC<Props> = ({
               <NumPad
                 value={id}
                 onChange={setId}
-                onConfirm={() => id.length === 13 && setStep('fp-wait')}
+                onConfirm={() => { if (id.length < 13) speakSafe(ID_INCOMPLETE[language]); }}
                 maxLength={13}
                 language={language}
               />
