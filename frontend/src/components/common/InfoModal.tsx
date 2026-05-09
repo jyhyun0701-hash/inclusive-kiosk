@@ -1,19 +1,52 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import imgKeypadInfo from '../../assets/images/keypad-info.png';
 import imgPopupInfo from  '../../assets/images/popup-info.png';
+import { useFocusManagerContext } from '../../context/FocusManagerContext';
 
 interface InfoModalProps {
   onClose: () => void;
 }
 
 const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
+  const fm = useFocusManagerContext();
+  // 모달이 열릴 때 트리거 엘리먼트를 직접 저장 (prevGroup에 의존하지 않음)
+  const savedFocusRef = useRef<{ group: string; tabindex: number } | null>(null);
+
+  useEffect(() => {
+    // StrictMode에서 useEffect가 2번 실행될 때 2차 실행에서 currentGroup이
+    // 이미 'modal-info'로 바뀐 상태이므로 savedFocusRef를 덮어쓰지 않도록 1회만 캡처
+    if (!savedFocusRef.current) {
+      const info = fm.getCurrentFocusInfo();
+      if (info) savedFocusRef.current = { group: info.group, tabindex: info.tabindex };
+    }
+
+    fm.initTabGroup(document, 'modal-info', { tabRotation: false, playTtsOnMoved: true });
+    if (fm.isActive()) fm.switchGroup('modal-info', 0);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    onClose(); // 먼저 상태 변경 (React re-render 예약)
+
+    // React DOM 커밋 완료 후 포커스 복원
+    // - onClose() 후 상태 변경으로 인한 className 업데이트가 focused 클래스를 덮지 않도록
+    //   double rAF로 커밋 완료 시점을 기다린 뒤 moveTabFocusManual 호출
+    if (fm.isActive() && savedFocusRef.current) {
+      const { group, tabindex } = savedFocusRef.current;
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() =>
+          fm.moveTabFocusManual(document, group, tabindex)
+        )
+      );
+    }
+  }, [fm, onClose]);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') handleClose();
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
+  }, [handleClose]);
 
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="이용 안내">
@@ -36,8 +69,12 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
         <button
           className="modal-btn confirm"
           style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '350px' }}
-          onClick={onClose}
+          onClick={handleClose}
           autoFocus
+          data-tabfocus="Y"
+          data-tabgroup="modal-info"
+          data-ttsmsg="확인"
+          tabIndex={0}
         >
           확인
         </button>

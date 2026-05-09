@@ -126,6 +126,9 @@ const App: React.FC = () => {
       'doc-search', 'numpad', 'identity', 'issuance',
     ];
     groups.forEach(g => fm.initTabGroup(document, g, { tabRotation: false, playTtsOnMoved: true }));
+    // 모달 그룹: 각 모달이 마운트될 때 자체 등록하지만 여기서 선행 등록으로 options 확보
+    fm.initTabGroup(document, 'modal-info',    { tabRotation: false, playTtsOnMoved: true });
+    fm.initTabGroup(document, 'modal-confirm', { tabRotation: true,  playTtsOnMoved: true });
     setupGroupsForScreen('main');
 
     return () => { channelRef.current?.close(); };
