@@ -5,7 +5,7 @@ import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import InfoModal from '../components/common/InfoModal';
 import imgSearch from '../assets/images/search.png';
-import { type Language, type Certificate, ALL_CERTIFICATES } from '../types/kiosk';
+import { type Language, type Certificate, ALL_CERTIFICATES, getCertName } from '../types/kiosk';
 
 interface CertificateListPageProps {
   language: Language;
@@ -87,10 +87,10 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
                 aria-label={cert.nameKo}
                 data-tabfocus="Y"
                 data-tabgroup="cert-list"
-                data-ttsmsg={cert.nameKo}
+                data-ttsmsg={getCertName(cert, language)}
                 tabIndex={idx}
               >
-                {cert.nameKo}
+                {getCertName(cert, language)}
               </button>
             ))}
           </div>

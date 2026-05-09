@@ -7,7 +7,7 @@ import ConfirmationModal from '../components/common/ConfirmationModal';
 import InfoModal from '../components/common/InfoModal';
 import imgSearch from '../assets/images/search.png';
 import imgDelete from '../assets/images/delete.png';
-import { type Language, type Certificate, ALL_CERTIFICATES } from '../types/kiosk';
+import { type Language, type Certificate, ALL_CERTIFICATES, getCertName } from '../types/kiosk';
 
 // ── 한글 IME ────────────────────────────────────────────────
 const CHOSUNG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
@@ -142,7 +142,10 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
     if (!query.trim()) return [];
     const q = query.toLowerCase();
     return ALL_CERTIFICATES.filter(c =>
-      c.nameKo.includes(q) || c.nameEn?.toLowerCase().includes(q)
+      c.nameKo.includes(q) ||
+      c.nameEn?.toLowerCase().includes(q) ||
+      c.nameJa?.includes(q) ||
+      c.nameZh?.includes(q)
     );
   }, [query]);
 
@@ -213,10 +216,10 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
                   aria-label={cert.nameKo}
                   data-tabfocus="Y"
                   data-tabgroup="doc-search"
-                  data-ttsmsg={cert.nameKo}
+                  data-ttsmsg={getCertName(cert, language)}
                   tabIndex={idx}
                 >
-                  {cert.nameKo}
+                  {getCertName(cert, language)}
                 </button>
               ))}
             </div>

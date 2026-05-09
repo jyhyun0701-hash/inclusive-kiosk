@@ -4,6 +4,7 @@ import NavPad from '../components/common/NavPad';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import type { Language, Certificate } from '../types/kiosk';
+import { getCertName } from '../types/kiosk';
 import imgPrint from '../assets/images/print.png';
 
 type IssueStep = 'preparing' | 'printing' | 'done';
@@ -17,6 +18,16 @@ interface Props {
   onToggleTts: () => void;
   onToggleMagnify: () => void;
 }
+
+const DONE_LABELS: Record<Language, {
+  complete: string; docLabel: string; feeLabel: string; feeUnit: string;
+  receipt: string; receiptDone: string; goHome: string;
+}> = {
+  ko: { complete: '발급이 완료되었습니다.',  docLabel: '발급 서류', feeLabel: '수수료', feeUnit: '원',    receipt: '영수증 발급',  receiptDone: '영수증이 출력되었습니다.', goHome: '처음으로 돌아가기' },
+  en: { complete: 'Issuance complete.',       docLabel: 'Document',  feeLabel: 'Fee',    feeUnit: 'KRW',   receipt: 'Print Receipt', receiptDone: 'Receipt printed.',          goHome: 'Back to Home'      },
+  ja: { complete: '発行が完了しました。',      docLabel: '発行書類',  feeLabel: '手数料', feeUnit: 'ウォン', receipt: '領収書発行',   receiptDone: '領収書が出力されました。',  goHome: '最初に戻る'        },
+  zh: { complete: '发证完成。',               docLabel: '发证文件',  feeLabel: '费用',   feeUnit: '韩元',   receipt: '打印收据',      receiptDone: '收据已打印。',             goHome: '返回首页'          },
+};
 
 const HEADER: Record<IssueStep, Record<Language, string>> = {
   preparing: {
@@ -53,6 +64,8 @@ const IssuancePage: React.FC<Props> = ({
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
+  const dl = DONE_LABELS[language];
+
   return (
     <div className="kiosk-root">
       <header className="kiosk-header">
@@ -67,7 +80,7 @@ const IssuancePage: React.FC<Props> = ({
           {step !== 'done' ? (
             <div className={`fingerprint-area${step === 'printing' ? ' printing' : ''}`}>
               <div className="status-card printing" style={{ width: '100%' }}>
-                {step === 'preparing' ? '문서 출력을 준비하고 있습니다.' : '문서가 출력되고 있습니다.'}
+                {HEADER[step][language]}
               </div>
               <div className="fingerprint-icon">
                 <img src={imgPrint} alt="print" />
@@ -75,11 +88,11 @@ const IssuancePage: React.FC<Props> = ({
             </div>
           ) : (
             <>
-              <div className="status-card done">발급이 완료되었습니다.</div>
+              <div className="status-card done">{dl.complete}</div>
               <table className="issue-table">
                 <tbody>
-                  <tr><td>발급 서류</td><td>{certificate.nameKo}</td></tr>
-                  <tr><td>수수료</td><td>{certificate.fee.toLocaleString()}원</td></tr>
+                  <tr><td>{dl.docLabel}</td><td>{getCertName(certificate, language)}</td></tr>
+                  <tr><td>{dl.feeLabel}</td><td>{certificate.fee.toLocaleString()} {dl.feeUnit}</td></tr>
                 </tbody>
               </table>
 
@@ -90,14 +103,14 @@ const IssuancePage: React.FC<Props> = ({
                   onClick={() => setReceiptPrinted(true)}
                   data-tabfocus="Y"
                   data-tabgroup="issuance"
-                  data-ttsmsg="영수증 발급"
+                  data-ttsmsg={dl.receipt}
                   tabIndex={0}
                 >
-                  영수증 발급
+                  {dl.receipt}
                 </button>
               ) : (
                 <div className="status-card success" style={{ marginTop: 24 }}>
-                  영수증이 출력되었습니다.
+                  {dl.receiptDone}
                 </div>
               )}
 
@@ -107,10 +120,10 @@ const IssuancePage: React.FC<Props> = ({
                 onClick={onHome}
                 data-tabfocus="Y"
                 data-tabgroup="issuance"
-                data-ttsmsg="처음으로 돌아가기"
+                data-ttsmsg={dl.goHome}
                 tabIndex={receiptPrinted ? 0 : 1}
               >
-                처음으로 돌아가기
+                {dl.goHome}
               </button>
             </>
           )}

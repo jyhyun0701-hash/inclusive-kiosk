@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import type { Certificate, Language } from '../../types/kiosk';
+import { getCertName } from '../../types/kiosk';
 import imgPopupInfo from  '../../assets/images/popup-info.png';
 
 interface ConfirmationModalProps {
@@ -70,7 +71,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly', padding: '48px 60px' }}>
           <div className="modal-body">
-            {l.body(certificate.nameKo).split('\n').map((line, i) => (
+            {l.body(getCertName(certificate, language)).split('\n').map((line, i) => (
               <p key={i}>{i === 0 ? <strong>{line}</strong> : line}</p>
             ))}
           </div>
@@ -79,7 +80,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               ref={confirmRef}
               className="modal-btn confirm"
               onClick={onConfirm}
-              aria-label={`${l.confirm} - ${certificate.nameKo}`}
+              aria-label={`${l.confirm} - ${getCertName(certificate, language)}`}
             >
               {l.confirm}
             </button>

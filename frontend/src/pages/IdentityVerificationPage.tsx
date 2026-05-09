@@ -24,6 +24,41 @@ interface Props {
   onVerified: () => void;
 }
 
+const ID_PLACEHOLDER: Record<Language, string> = {
+  ko: '주민번호를 입력하십시오. 예) 901010-1234567',
+  en: 'Enter ID number. e.g. 901010-1234567',
+  ja: '住民番号を入力してください。例) 901010-1234567',
+  zh: '请输入居民号码。例) 901010-1234567',
+};
+
+const FP_STATUS: Record<'wait' | 'fail' | 'ok', Record<Language, string>> = {
+  wait: {
+    ko: '지문 입력기에 엄지 손가락을 올려주십시오.',
+    en: 'Please place your thumb on the fingerprint reader.',
+    ja: '指紋入力機に親指を置いてください。',
+    zh: '请将拇指放在指纹识别器上。',
+  },
+  fail: {
+    ko: '지문 인식에 실패했습니다.\n손가락이 건조하거나, 위치가 맞지 않으면 인식에 실패합니다. 손가락을 다시 올려주세요.',
+    en: 'Fingerprint recognition failed.\nPlease ensure your finger is dry and positioned correctly.',
+    ja: '指紋認識に失敗しました。\n指が乾燥しているか位置が正しくない場合、認識に失敗します。もう一度置いてください。',
+    zh: '指纹识别失败。\n手指干燥或位置不正确时识别会失败，请重新放置手指。',
+  },
+  ok: {
+    ko: '지문 인식에 성공하였습니다.',
+    en: 'Fingerprint recognized successfully.',
+    ja: '指紋認識に成功しました。',
+    zh: '指纹识别成功。',
+  },
+};
+
+const RETRY_LABEL: Record<Language, string> = {
+  ko: '다시 시도',
+  en: 'Try Again',
+  ja: 'もう一度',
+  zh: '重试',
+};
+
 const HEADER: Record<VerifyStep, Record<Language, string>> = {
   'id-input': {
     ko: '주민번호 13자리를 입력해주십시오.',
@@ -107,19 +142,14 @@ const IdentityVerificationPage: React.FC<Props> = ({
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               {/* 입력값 표시 */}
               <div className={`id-display${!id ? ' empty' : ''}`}>
-                {id ? (
-                    formatId(id)
-                  ) : (
-                    <>
-                      주민번호를 입력하십시오. 예) 901010-1234567
-                    </>
-                  )}
+                {id ? formatId(id) : ID_PLACEHOLDER[language]}
               </div>
               <NumPad
                 value={id}
                 onChange={setId}
                 onConfirm={() => id.length === 13 && setStep('fp-wait')}
                 maxLength={13}
+                language={language}
               />
             </div>
           )}
@@ -128,7 +158,7 @@ const IdentityVerificationPage: React.FC<Props> = ({
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <div className="fingerprint-area">
                 <div className="status-card info" style={{ width: '100%' }}>
-                  지문 입력기에 엄지 손가락을 올려주십시오.
+                  {FP_STATUS.wait[language]}
                 </div>
                 <div className="fingerprint-icon">
                   <img src={imgFPScan} alt="scan"/>
@@ -140,8 +170,9 @@ const IdentityVerificationPage: React.FC<Props> = ({
           {step === 'fp-fail' && (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <div className="status-card error">
-                지문 인식에 실패했습니다.
-                손가락이 건조하거나, 손가락 위치가 맞지 않으면 인식에 실패합니다. 손가락을 다시 올려주세요.
+                {FP_STATUS.fail[language].split('\n').map((line, i) => (
+                  <span key={i}>{line}{i === 0 && <br />}</span>
+                ))}
               </div>
               <div className="fingerprint-area">
                 <div className="fingerprint-icon">
@@ -153,10 +184,10 @@ const IdentityVerificationPage: React.FC<Props> = ({
                   onClick={() => setStep('fp-wait')}
                   data-tabfocus="Y"
                   data-tabgroup="identity"
-                  data-ttsmsg="다시 시도"
+                  data-ttsmsg={RETRY_LABEL[language]}
                   tabIndex={0}
                 >
-                  다시 시도
+                  {RETRY_LABEL[language]}
                 </button>
               </div>
             </div>
@@ -166,7 +197,7 @@ const IdentityVerificationPage: React.FC<Props> = ({
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <div className="fingerprint-area">
                 <div className="status-card success" style={{ width: '100%' }}>
-                  지문 인식에 성공하였습니다.
+                  {FP_STATUS.ok[language]}
                 </div>
                 <div className="fingerprint-icon">
                   <img src={imgFPSuccess} alt="success"/>

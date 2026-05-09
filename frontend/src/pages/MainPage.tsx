@@ -4,7 +4,7 @@ import NavPad from '../components/common/NavPad';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import InfoModal from '../components/common/InfoModal';
-import { type Language, QUICK_CERTIFICATES } from '../types/kiosk';
+import { type Language, QUICK_CERTIFICATES, getCertName } from '../types/kiosk';
 import imgKr from "../assets/images/kr.png";
 import imgEn from "../assets/images/en.png";
 import imgJp from "../assets/images/jp.png";
@@ -78,10 +78,10 @@ const MainPage: React.FC<MainPageProps> = ({
                 aria-label={cert.nameKo}
                 data-tabfocus="Y"
                 data-tabgroup="main"
-                data-ttsmsg={cert.nameKo}
+                data-ttsmsg={getCertName(cert, language)}
                 tabIndex={idx}
               >
-                {language === 'ko' ? cert.nameKo : (cert.nameEn ?? cert.nameKo)}
+                {getCertName(cert, language)}
               </button>
             ))}
             <button

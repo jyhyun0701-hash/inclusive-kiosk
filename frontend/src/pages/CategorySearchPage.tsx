@@ -10,7 +10,7 @@ import imgCategory from '../assets/images/category.png';
 import imgSearch from '../assets/images/search.png';
 import {
   type Language, type Certificate, type CertificateCategory,
-  CATEGORY_TABS, CERTIFICATES_BY_CATEGORY,
+  CATEGORY_TABS, CERTIFICATES_BY_CATEGORY, CATEGORY_LABELS, getCertName,
 } from '../types/kiosk';
 
 interface CategorySearchPageProps {
@@ -30,6 +30,13 @@ const HEADER: Record<Language, string> = {
   en: 'Please select the certificate to issue.',
   ja: '発行をご希望の証明書をお選びください。',
   zh: '请选择要发证的证明书。',
+};
+
+const SECTION: Record<Language, { category: string; selected: string; search: string }> = {
+  ko: { category: '증명서 카테고리', selected: '선택한 카테고리 목록', search: '증명서 검색' },
+  en: { category: 'Certificate Category', selected: 'Selected Category', search: 'Search' },
+  ja: { category: '証明書カテゴリー', selected: '選択したカテゴリー一覧', search: '証明書検索' },
+  zh: { category: '证明书类别', selected: '已选类别列表', search: '证明书检索' },
 };
 
 const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
@@ -86,15 +93,15 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
             className="search-type-btn"
             onClick={onSearchClick}
             style={{ marginLeft: 'auto', marginBottom: '35px' }}
-            aria-label="증명서 검색"
+            aria-label={SECTION[language].search}
           >
             <img src={imgSearch} alt="search" />
-            증명서 검색
+            {SECTION[language].search}
           </button>
 
           {/* 섹션 헤더 */}
           <div className="section-label">
-            <span>증명서 카테고리</span>
+            <span>{SECTION[language].category}</span>
             <img src={imgCategory} alt="category" />
           </div>
 
@@ -106,13 +113,13 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
                 className={`category-btn-6${selectedCategory === cat ? ' selected' : ''}`}
                 onClick={() => handleCategoryClick(cat)}
                 aria-pressed={selectedCategory === cat}
-                aria-label={cat}
+                aria-label={CATEGORY_LABELS[cat]?.[language] ?? cat}
                 data-tabfocus="Y"
                 data-tabgroup="category"
-                data-ttsmsg={cat}
+                data-ttsmsg={CATEGORY_LABELS[cat]?.[language] ?? cat}
                 tabIndex={idx}
               >
-                {cat}
+                {CATEGORY_LABELS[cat]?.[language] ?? cat}
               </button>
             ))}
           </div>
@@ -121,7 +128,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
           {selectedCategory && subCerts.length > 0 && (
             <>
               <div className="section-label">
-                <span>선택한 카테고리 목록</span>
+                <span>{SECTION[language].selected}</span>
                 <img src={imgCategory} alt="category" />
               </div>
               <div className="sub-cert-grid">
@@ -130,13 +137,13 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
                     key={cert.id}
                     className={`sub-cert-btn${highlightedCertId === cert.id ? ' selected' : ''}`}
                     onClick={() => handleCertClick(cert)}
-                    aria-label={cert.nameKo}
+                    aria-label={getCertName(cert, language)}
                     data-tabfocus="Y"
                     data-tabgroup="sub-cert"
-                    data-ttsmsg={cert.nameKo}
+                    data-ttsmsg={getCertName(cert, language)}
                     tabIndex={idx}
                   >
-                    {cert.nameKo}
+                    {getCertName(cert, language)}
                   </button>
                 ))}
               </div>
