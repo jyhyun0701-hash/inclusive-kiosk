@@ -5,6 +5,7 @@ import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import type { Language, Certificate } from '../types/kiosk';
 import { getCertName } from '../types/kiosk';
+import { useFocusManagerContext } from '../context/FocusManagerContext';
 import imgPrint from '../assets/images/print.png';
 
 type IssueStep = 'preparing' | 'printing' | 'done';
@@ -54,6 +55,7 @@ const IssuancePage: React.FC<Props> = ({
   language, certificate, isTtsOn, isMagnified,
   onHome, onToggleTts, onToggleMagnify,
 }) => {
+  const fm = useFocusManagerContext();
   const [step, setStep] = useState<IssueStep>('preparing');
   const [receiptPrinted, setReceiptPrinted] = useState(false);
   const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
@@ -63,6 +65,16 @@ const IssuancePage: React.FC<Props> = ({
     const t2 = setTimeout(() => setStep('done'), 5000);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
+
+  // 발급 완료 단계 진입 시 영수증 발급 버튼으로 초기 포커스 이동
+  useEffect(() => {
+    if (step === 'done' && isTtsOn) fm.activateFocusMode('issuance', 0);
+  }, [step, isTtsOn]);
+
+  // 영수증 발급 후 처음으로 버튼(tabIndex=0으로 재배치)으로 포커스 이동
+  useEffect(() => {
+    if (receiptPrinted && isTtsOn) fm.activateFocusMode('issuance', 0);
+  }, [receiptPrinted]);
 
   const dl = DONE_LABELS[language];
 
@@ -117,7 +129,7 @@ const IssuancePage: React.FC<Props> = ({
               <button
                 className="cert-btn"
                 style={{ width: '600px', maxWidth: '600px' }}
-                onClick={onHome}
+                onClick={() => { if (isTtsOn) onToggleTts(); onHome(); }}
                 data-tabfocus="Y"
                 data-tabgroup="issuance"
                 data-ttsmsg={dl.goHome}
