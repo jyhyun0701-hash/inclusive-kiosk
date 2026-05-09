@@ -155,7 +155,7 @@ html, body {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 40px;
+  padding: 35px;
   background: var(--white);
 }
 
@@ -192,8 +192,8 @@ html, body {
 
 /* 접근성 모드 포커스 공통 스타일 (applyFocus가 .focused 클래스를 추가) */
 [data-tabfocus="Y"].focused {
-  outline: 4px solid var(--yellow);
-  outline-offset: 3px;
+  outline: 8px solid var(--yellow);
+  outline-offset: 2px;
 }
 
 .bottom-btn img {
@@ -223,8 +223,6 @@ html, body {
   outline: none;
 }
 .bottom-btn:active { transform: scale(0.97); filter: brightness(0.88); }
-.bottom-btn.focused,
-.bottom-btn:focus-visible { outline: 4px solid var(--yellow); outline-offset: 3px; }
 .bottom-btn.home    { background: var(--pink);     color: #111; }
 .bottom-btn.info    { background: var(--gray-mid); color: #111; }
 .bottom-btn.tts     { background: var(--blue-light); color: #111; }
@@ -283,7 +281,7 @@ html, body {
 /* 언어 선택 */
 .lang-selector {
   display: flex;
-  gap: 65px;
+  justify-content: space-around;
 }
 .lang-btn {
   width: 200px; height: 200px;
@@ -304,8 +302,6 @@ html, body {
 
 .flag img { width: 85px; height: 85px; }
 .lang-btn.active { background: var(--blue-deep); }
-.lang-btn.focused,
-.lang-btn:focus-visible { outline: 4px solid var(--yellow); outline-offset: 4px; }
 
 /* ──────────────────────────────────────────────
    9. 2-1 증명서 전체보기
@@ -417,7 +413,7 @@ html, body {
   display: grid;
   justify-items: center;
   grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
+  gap: 30px;
 }
 .sub-cert-btn {
   width: 305px;
@@ -819,16 +815,12 @@ html, body {
 }
 .printing .fingerprint-icon { animation: blink 1.2s ease-in-out infinite; }
 
-.kiosk-content {
-  position: relative;
-  overflow: hidden;       /* content-scroll-wrap 안에서만 스크롤 */
-}
-
 /* ── content-scroll-wrap 기본값 ──────────────────────────────── */
 .content-scroll-wrap {
   width: 100%;
   height: 100%;
   overflow: auto;
+  padding: 0 8px;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

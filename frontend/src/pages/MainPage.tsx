@@ -97,7 +97,7 @@ const MainPage: React.FC<MainPageProps> = ({
             </button>
           </div>
           </div>
-          <div className="lang-selector" style={{ marginTop: 'auto', paddingBottom: '0' }}>
+          <div className="lang-selector" style={{ marginTop: 'auto', paddingBottom: '10px' }}>
             {LANG_LIST.map((l, idx) => (
               <button
                 key={l.code}
