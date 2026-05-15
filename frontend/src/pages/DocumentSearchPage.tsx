@@ -7,7 +7,7 @@ import ConfirmationModal from '../components/common/ConfirmationModal';
 import InfoModal from '../components/common/InfoModal';
 import imgSearch from '../assets/images/search.png';
 import imgDelete from '../assets/images/delete.png';
-import { type Language, type Certificate, getCertName } from '../types/kiosk';
+import { type Language, type Certificate, type allCertificates, getCertName } from '../types/kiosk';
 
 // ── 한글 IME ────────────────────────────────────────────────
 const CHOSUNG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
@@ -111,7 +111,7 @@ const NO_RESULT: Record<Language, string> = {
 
 const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
   language, isTtsOn, isMagnified,
-  onHome, onToggleTts, onToggleMagnify,
+  allCertificates, onHome, onToggleTts, onToggleMagnify,
   onCertificateConfirmed, onCategorySearch,
 }) => {
   const [koState, setKoState] = useState<KoState>(KO_INIT);

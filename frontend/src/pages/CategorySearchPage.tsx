@@ -42,7 +42,8 @@ const SECTION: Record<Language, { category: string; selected: string; search: st
 
 const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
   language, isTtsOn, isMagnified,
-  initialCategory, onHome, onToggleTts, onToggleMagnify,
+  initialCategory, byCategory,
+  onHome, onToggleTts, onToggleMagnify,
   onCertificateConfirmed, onSearchClick,
 }) => {
   const fm = useFocusManagerContext();
@@ -55,13 +56,16 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
   const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
+    fm.registerGroupChain('search', { next: 'category', prev: 'bottombar' });
+
     if (selectedCategory) {
-      fm.registerGroupChain('category',   { next: 'sub-cert',   prev: 'bottombar' });
-      fm.registerGroupChain('sub-cert',   { next: 'cat-bottom', prev: 'category'  });
-      fm.registerGroupChain('cat-bottom', { next: 'bottombar',  prev: 'sub-cert'  });
+      fm.registerGroupChain('category',   { next: 'sub-cert',   prev: 'search' });  // ← 'bottombar' → 'search'
+      fm.registerGroupChain('sub-cert',   { next: 'cat-bottom', prev: 'category' });
+      fm.registerGroupChain('cat-bottom', { next: 'bottombar',  prev: 'sub-cert' });
+      fm.registerGroupChain('bottombar', {prev: 'category'});
     } else {
-      fm.registerGroupChain('category',   { next: 'cat-bottom', prev: 'bottombar' });
-      fm.registerGroupChain('cat-bottom', { next: 'bottombar',  prev: 'category'  });
+      fm.registerGroupChain('category',   { next: 'cat-bottom', prev: 'search' });  // ← 'bottombar' → 'search'
+      fm.registerGroupChain('cat-bottom', { next: 'bottombar',  prev: 'category' });
     }
   }, [selectedCategory]);
 
@@ -95,6 +99,10 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
             onClick={onSearchClick}
             style={{ marginLeft: 'auto', marginBottom: '35px' }}
             aria-label={SECTION[language].search}
+            data-tabfocus="Y"
+            data-tabgroup="search"
+            data-ttsmsg={SECTION[language].search}
+            tabIndex={0}
           >
             <img src={imgSearch} alt="search" />
             {SECTION[language].search}
