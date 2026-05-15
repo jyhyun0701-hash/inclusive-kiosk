@@ -47,7 +47,7 @@ export interface KioskState {
 export const QUICK_CERT_IDS: string[] = [
   '1',  // 주민등록등본
   '3',  // 가족관계증명서
-  '6',  // 부동산등기사항증명서
+  '14',  // 부동산등기사항증명서
 ];
 
 /** 2-1 전체보기 카테고리 그리드 순서 */
