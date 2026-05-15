@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Language } from '../types/certificate';
+import { setGlobalTts } from '../utils/speakSafe';  // ← 추가
 
 interface AccessibilityState {
   ttsEnabled:         boolean;
@@ -21,8 +22,16 @@ export const AccessibilityProvider = ({ children }: { children: ReactNode }) => 
   const [highContrast, setHighContrast] = useState(false);
   const [language,     setLanguage]     = useState<Language>('ko');
 
-  const toggleTTS = () => setTtsEnabled(p => !p);
+  const toggleTTS = () => {
+    setTtsEnabled(prev => {
+      const next = !prev;
+      setGlobalTts(next);  // ← 핵심 수정: React 상태와 모듈 변수 동기화
+      return next;
+    });
+  };
+
   const toggleZoom = () => setZoomEnabled(p => !p);
+
   const toggleHighContrast = () => {
     setHighContrast(p => {
       document.body.classList.toggle('high-contrast', !p);

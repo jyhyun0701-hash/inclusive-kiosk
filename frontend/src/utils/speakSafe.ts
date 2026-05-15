@@ -1,16 +1,6 @@
-/**
- * speakSafe v14
- *
- * 수정사항:
- * 1. globalTtsEnabled 플래그로 TTS 꺼진 상태 완전 차단
- * 2. 중복 발화 방지: lastMsg 체크
- * 3. speakPriority: cancel → 50ms → speak (Chrome stuck 방지)
- */
-
 let globalTtsEnabled = false;
 let lastMsg = '';
 
-/** BottomBar에서 TTS 상태 변경 시 호출 */
 export const setGlobalTts = (enabled: boolean) => {
   globalTtsEnabled = enabled;
   if (!enabled) {
@@ -36,17 +26,25 @@ function makeUtt(msg: string): SpeechSynthesisUtterance {
   utt.volume = 1.0;
   const voice = getKoVoice();
   if (voice) utt.voice = voice;
-  utt.onend = () => { lastMsg = ''; };
+
+  // 수정: cancel() 시 onerror('interrupted')가 발생하므로 여기서도 초기화
+  utt.onend   = () => { lastMsg = ''; };
+  utt.onerror = (e) => {
+    if (e.error !== 'interrupted') {
+      console.warn('[TTS] error:', e.error);
+    }
+    lastMsg = '';  // ← 핵심 추가: cancel 후 같은 메시지 재발화 가능하게
+  };
   return utt;
 }
 
 /**
  * 우선 발화 — 기존 취소 후 즉시 재생
- * 음성 켜기 버튼 클릭 등 클릭 핸들러 안에서만 호출
+ * ✅ 수정: globalTtsEnabled 체크 추가 (TTS 꺼진 상태에서 호출 방지)
  */
 export const speakPriority = (msg: string) => {
+  if (!globalTtsEnabled) return;  // ← 추가
   if (!window.speechSynthesis || !msg.trim()) return;
-  // setGlobalTts(true) 직후 호출되므로 globalTtsEnabled 체크 생략
 
   window.speechSynthesis.cancel();
   lastMsg = msg;
@@ -59,14 +57,12 @@ export const speakPriority = (msg: string) => {
 
 /**
  * 일반 발화 — TTS 꺼진 상태면 완전 차단
- * 중복 메시지 연속 발화 방지
  */
 export const speakSafe = (msg: string) => {
   if (!globalTtsEnabled) return;
   if (!window.speechSynthesis || !msg.trim()) return;
   if (lastMsg === msg) return;
 
-  // ← 이전 음성 즉시 중단 후 발화
   window.speechSynthesis.cancel();
   lastMsg = msg;
 
