@@ -139,27 +139,31 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
       );
   }, [query, allCertificates]);
 
-  useEffect(() => {
-        fm.initTabGroup(document, 'keyboard', { tabRotation: false, playTtsOnMoved: true });
-        fm.registerGroupChain('keyboard',  { next: 'bottombar', prev: 'bottombar' });
-        fm.registerGroupChain('bottombar', { next: 'keyboard',  prev: 'keyboard'  });
-        fm.activateFocusMode('keyboard', 0);
-    }, []);
+    // TTS 켜질 때마다 재실행
+    useEffect(() => {
+      if (!isTtsOn) return;                // TTS 꺼진 상태면 스킵
+      fm.initTabGroup(document, 'keyboard', { tabRotation: false, playTtsOnMoved: true });
+      fm.registerGroupChain('keyboard',  { next: 'bottombar', prev: 'bottombar' });
+      fm.registerGroupChain('bottombar', { next: 'keyboard',  prev: 'keyboard'  });
+      fm.activateFocusMode('keyboard', 0);
+    }, [isTtsOn]);
 
     useEffect(() => {
+      if (!isTtsOn) return;
       fm.activateFocusMode('keyboard', 0);
     }, [kbMode]);
 
     useEffect(() => {
-        if (results.length > 0) {
-          fm.registerGroupChain('keyboard',   { next: 'doc-search', prev: 'bottombar' });
-          fm.registerGroupChain('doc-search', { next: 'bottombar',  prev: 'keyboard'  });
-          fm.registerGroupChain('bottombar',  { next: 'keyboard',   prev: 'doc-search' });
-        } else {
-          fm.registerGroupChain('keyboard',  { next: 'bottombar', prev: 'bottombar' });
-          fm.registerGroupChain('bottombar', { next: 'keyboard',  prev: 'keyboard'  });
-        }
-    }, [results.length]);
+      if (!isTtsOn) return;
+      if (results.length > 0) {
+        fm.registerGroupChain('keyboard',   { next: 'doc-search', prev: 'bottombar' });
+        fm.registerGroupChain('doc-search', { next: 'bottombar',  prev: 'keyboard'  });
+        fm.registerGroupChain('bottombar',  { next: 'keyboard',   prev: 'doc-search' });
+      } else {
+        fm.registerGroupChain('keyboard',  { next: 'bottombar', prev: 'bottombar' });
+        fm.registerGroupChain('bottombar', { next: 'keyboard',  prev: 'keyboard'  });
+      }
+    }, [results.length, isTtsOn]);
 
   const append = (ch: string) => {
     if (kbMode === 'ko') setKoState(s => koAdd(s, ch));

@@ -25,7 +25,7 @@ const getFirstGroupForScreen = (screenId: string): string => {
     case 'main':            return 'main';
     case 'cert-list':       return 'cert-list-top';
     case 'category-search': return 'category';
-    case 'doc-search':      return 'bottombar';
+    case 'doc-search':      return 'keyboard';
     case 'identity':        return 'numpad';
     case 'issuance':        return 'bottombar';
     default:                return 'bottombar';
@@ -83,13 +83,13 @@ const App: React.FC = () => {
         fm.registerGroupChain('bottombar',     { next: 'cert-list-top', prev: 'cert-list' });
         break;
       case 'category-search':
-        fm.registerGroupChain('category',      { next: 'cat-bottom',    prev: 'bottombar' });
-        fm.registerGroupChain('cat-bottom',    { next: 'bottombar',     prev: 'category' });
-        fm.registerGroupChain('bottombar',     { next: 'category',      prev: 'cat-bottom' });
+        fm.registerGroupChain('search',      { next: 'category',    prev: 'bottombar' });
+        fm.registerGroupChain('category',    { next: 'bottombar',     prev: 'search' });
+        fm.registerGroupChain('bottombar',     { next: 'search',      prev: 'category' });
         break;
       case 'doc-search':
-        fm.registerGroupChain('doc-search',    { next: 'bottombar',     prev: 'bottombar' });
-        fm.registerGroupChain('bottombar',     { next: 'doc-search',    prev: 'doc-search' });
+        fm.registerGroupChain('keyboard',    { next: 'bottombar',     prev: 'bottombar' });
+        fm.registerGroupChain('bottombar',     { next: 'keyboard',    prev: 'keyboard' });
         break;
       case 'identity':
         fm.registerGroupChain('numpad',        { next: 'bottombar',     prev: 'bottombar' });

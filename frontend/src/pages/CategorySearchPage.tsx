@@ -56,6 +56,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
   const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
+    if (!isTtsOn) return;
     // search는 양쪽 케이스 공통
     fm.registerGroupChain('search', { next: 'category', prev: 'bottombar' });
 
@@ -68,8 +69,10 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
       // 카테고리만 표시
       fm.registerGroupChain('category',  { next: 'bottombar', prev: 'search'   });
           fm.registerGroupChain('bottombar', { next: 'search',    prev: 'category' });
-        }
-      }, [selectedCategory]);
+      }
+      // TTS 켜질 때 초기 포커스를 category 첫 번째 항목으로
+      fm.activateFocusMode('category', 0);
+  }, [isTtsOn, selectedCategory]);
 
   const handleCategoryClick = (cat: CertificateCategory) => {
     setSelectedCategory(prev => prev === cat ? null : cat);
