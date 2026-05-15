@@ -4,7 +4,7 @@ import NavPad from '../components/common/NavPad';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import InfoModal from '../components/common/InfoModal';
-import { type Language, QUICK_CERTIFICATES, getCertName } from '../types/kiosk';
+import { type Language, type Certificate, getCertName } from '../types/kiosk';
 import imgKr from "../assets/images/kr.png";
 import imgEn from "../assets/images/en.png";
 import imgJp from "../assets/images/jp.png";
@@ -14,6 +14,7 @@ interface MainPageProps {
   language: Language;
   isTtsOn: boolean;
   isMagnified: boolean;
+  quickCertificates: Certificate[];
   onLanguageChange: (lang: Language) => void;
   onCertificateSelect: (certId: string) => void;
   onMoreCertificates: () => void;
@@ -42,7 +43,7 @@ const MORE_LABEL: Record<Language, string> = {
 };
 
 const MainPage: React.FC<MainPageProps> = ({
-  language, isTtsOn, isMagnified,
+  language, isTtsOn, isMagnified, quickCertificates,
   onLanguageChange, onCertificateSelect, onMoreCertificates,
   onToggleTts, onToggleMagnify,
 }) => {
@@ -70,7 +71,7 @@ const MainPage: React.FC<MainPageProps> = ({
           </div>
 
           <div className="cert-list">
-            {QUICK_CERTIFICATES.map((cert, idx) => (
+            {quickCertificates.map((cert, idx) => (
               <button
                 key={cert.id}
                 className="cert-btn"
@@ -91,7 +92,7 @@ const MainPage: React.FC<MainPageProps> = ({
               data-tabfocus= "Y"
               data-tabgroup="main"
               data-ttsmsg={MORE_LABEL[language]}
-              tabIndex={QUICK_CERTIFICATES.length}
+              tabIndex={quickCertificates.length}
             >
               {MORE_LABEL[language]}
             </button>

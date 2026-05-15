@@ -5,12 +5,13 @@ import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
 import InfoModal from '../components/common/InfoModal';
 import imgSearch from '../assets/images/search.png';
-import { type Language, type Certificate, ALL_CERTIFICATES, getCertName } from '../types/kiosk';
+import { type Language, type Certificate, getCertName } from '../types/kiosk';
 
 interface CertificateListPageProps {
   language: Language;
   isTtsOn: boolean;
   isMagnified: boolean;
+  allCertificates: Certificate[];
   onHome: () => void;
   onToggleTts: () => void;
   onToggleMagnify: () => void;
@@ -33,7 +34,7 @@ const LABEL_SEARCH: Record<Language, string> = {
 };
 
 const CertificateListPage: React.FC<CertificateListPageProps> = ({
-  language, isTtsOn, isMagnified,
+  language, isTtsOn, isMagnified, allCertificates,
   onHome, onToggleTts, onToggleMagnify,
   onCategorySearchClick, onCertificateSelect, onSearchClick,
 }) => {
@@ -79,7 +80,7 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
 
           {/* 전체 증명서 그리드 */}
           <div className="all-category-grid">
-            {ALL_CERTIFICATES.map((cert, idx) => (
+            {allCertificates.map((cert, idx) => (
               <button
                 key={cert.id}
                 className="all-category-btn"

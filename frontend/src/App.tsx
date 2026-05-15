@@ -10,9 +10,10 @@ import IssuancePage from './pages/IssuancePage';
 import VirtualKeypad, { type KeypadKey } from './components/common/VirtualKeypad';
 import { useFocusManagerContext } from './context/FocusManagerContext';
 import { setGlobalTts} from './utils/speakSafe';
+import { useCertificates } from './hooks/useCertificates';
 
 import {
-  type Language, type Certificate, type CertificateCategory, QUICK_CERTIFICATES,
+  type Language, type Certificate, type CertificateCategory,
 } from './types/kiosk';
 
 const CHANNEL_NAME = 'kiosk-keypad';
@@ -67,6 +68,7 @@ const App: React.FC = () => {
   const handleToggleTtsRef = useRef<(() => void) | null>(null);
 
   const fm = useFocusManagerContext();
+  const { quickCertificates, allCertificates, byCategory, loading, error } = useCertificates();
 
   const setupGroupsForScreen = useCallback((screenId: string) => {
     switch (screenId) {
@@ -224,9 +226,10 @@ const closeKeypad = useCallback(() => {
         return (
           <MainPage
             {...common}
+            quickCertificates={quickCertificates}
             onLanguageChange={(lang) => { setLanguage(lang); }}
             onCertificateSelect={(certId) => {
-              const cert = QUICK_CERTIFICATES.find(c => c.id === certId)!;
+              const cert = quickCertificates.find(c => c.id === certId)!;
               goTo({ id: 'identity', certificate: cert }, `${cert.nameKo}이 선택되었습니다.`, 'numpad', 0);
             }}
             onMoreCertificates={() => {
@@ -239,6 +242,7 @@ const closeKeypad = useCallback(() => {
         return (
           <CertificateListPage
             {...common}
+            allCertificates={allCertificates}
             onHome={goHome}
             onCategorySearchClick={() => {
               goTo({ id: 'category-search' }, '카테고리 검색 화면으로 이동합니다.', 'category', 0);
@@ -254,6 +258,7 @@ const closeKeypad = useCallback(() => {
         return (
           <CategorySearchPage
             {...common}
+            byCategory={byCategory}
             initialCategory={screen.initialCategory}
             onHome={goHome}
             onCertificateConfirmed={(cert) => {
@@ -267,6 +272,7 @@ const closeKeypad = useCallback(() => {
         return (
           <DocumentSearchPage
             {...common}
+            allCertificates={allCertificates}
             onHome={goHome}
             onCertificateConfirmed={(cert) => {
               goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'numpad', 0);
@@ -300,6 +306,22 @@ const closeKeypad = useCallback(() => {
         );
       }
   };
+
+  if (loading) return (
+    <div className="kiosk-frame">
+      <div className="kiosk-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ fontSize: 40, color: '#0D2461' }}>데이터를 불러오는 중...</p>
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="kiosk-frame">
+      <div className="kiosk-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ fontSize: 36, color: '#E74C3C' }}>서버 연결 오류. 관리자에게 문의하세요.</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="kiosk-wrap">

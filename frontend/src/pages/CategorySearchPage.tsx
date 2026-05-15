@@ -10,7 +10,7 @@ import imgCategory from '../assets/images/category.png';
 import imgSearch from '../assets/images/search.png';
 import {
   type Language, type Certificate, type CertificateCategory,
-  CATEGORY_TABS, CERTIFICATES_BY_CATEGORY, CATEGORY_LABELS, getCertName,
+  CATEGORY_TABS, CATEGORY_LABELS, getCertName,
 } from '../types/kiosk';
 
 interface CategorySearchPageProps {
@@ -18,6 +18,7 @@ interface CategorySearchPageProps {
   isTtsOn: boolean;
   isMagnified: boolean;
   initialCategory?: CertificateCategory;
+  byCategory: Record<string, Certificate[]>;
   onHome: () => void;
   onToggleTts: () => void;
   onToggleMagnify: () => void;
@@ -75,7 +76,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
   };
 
   const subCerts: Certificate[] = selectedCategory
-    ? (CERTIFICATES_BY_CATEGORY[selectedCategory] ?? [])
+    ? (byCategory[selectedCategory] ?? [])
     : [];
 
   return (

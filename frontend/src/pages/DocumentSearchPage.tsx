@@ -7,7 +7,7 @@ import ConfirmationModal from '../components/common/ConfirmationModal';
 import InfoModal from '../components/common/InfoModal';
 import imgSearch from '../assets/images/search.png';
 import imgDelete from '../assets/images/delete.png';
-import { type Language, type Certificate, ALL_CERTIFICATES, getCertName } from '../types/kiosk';
+import { type Language, type Certificate, getCertName } from '../types/kiosk';
 
 // ── 한글 IME ────────────────────────────────────────────────
 const CHOSUNG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
@@ -82,6 +82,7 @@ interface DocumentSearchPageProps {
   language: Language;
   isTtsOn: boolean;
   isMagnified: boolean;
+  allCertificates: Certificate[];
   onHome: () => void;
   onToggleTts: () => void;
   onToggleMagnify: () => void;
@@ -141,7 +142,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
   const results = useMemo<Certificate[]>(() => {
     if (!query.trim()) return [];
     const q = query.toLowerCase();
-    return ALL_CERTIFICATES.filter(c =>
+    return allCertificates.filter(c =>
       c.nameKo.includes(q) ||
       c.nameEn?.toLowerCase().includes(q) ||
       c.nameJa?.includes(q) ||
