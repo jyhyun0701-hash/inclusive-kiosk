@@ -519,6 +519,8 @@ html, body {
   justify-content: space-between;
   margin-top: 18px;
   gap: 30px;
+  padding-bottom: 50px;
+  border-bottom: 3px solid #ccc;
 }
 .kb-action-btn {
   width: 379px;
@@ -545,12 +547,11 @@ html, body {
   display: flex;
   flex-wrap: wrap;
   gap: 40px;
-  margin-top: 8px;
+  margin-top: 40px;
 }
 .search-result-btn {
   width: 300px;
   height: 110px;
-  margin: 40px 0;
   background-color: var(--navy);
   color: var(--white);
   border: none;
