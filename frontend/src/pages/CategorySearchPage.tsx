@@ -56,18 +56,20 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
   const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
+    // search는 양쪽 케이스 공통
     fm.registerGroupChain('search', { next: 'category', prev: 'bottombar' });
 
     if (selectedCategory) {
+      // 카테고리 + 상세 조회 표시
       fm.registerGroupChain('category',   { next: 'sub-cert',   prev: 'search' });  // ← 'bottombar' → 'search'
-      fm.registerGroupChain('sub-cert',   { next: 'cat-bottom', prev: 'category' });
-      fm.registerGroupChain('cat-bottom', { next: 'bottombar',  prev: 'sub-cert' });
-      fm.registerGroupChain('bottombar', {prev: 'category'});
+      fm.registerGroupChain('sub-cert',   { next: 'bottombar', prev: 'category' });
+      fm.registerGroupChain('bottombar', { next: 'search', prev: 'sub-cert'});
     } else {
-      fm.registerGroupChain('category',   { next: 'cat-bottom', prev: 'search' });  // ← 'bottombar' → 'search'
-      fm.registerGroupChain('cat-bottom', { next: 'bottombar',  prev: 'category' });
-    }
-  }, [selectedCategory]);
+      // 카테고리만 표시
+      fm.registerGroupChain('category',  { next: 'bottombar', prev: 'search'   });
+          fm.registerGroupChain('bottombar', { next: 'search',    prev: 'category' });
+        }
+      }, [selectedCategory]);
 
   const handleCategoryClick = (cat: CertificateCategory) => {
     setSelectedCategory(prev => prev === cat ? null : cat);

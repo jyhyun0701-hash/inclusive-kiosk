@@ -317,6 +317,7 @@ html, body {
 .search-type-btn {
   width: 305px;
   height: 110px;
+  margin-top: 8px;
   border: none;
   border-radius: var(--r);
   font-family: inherit;

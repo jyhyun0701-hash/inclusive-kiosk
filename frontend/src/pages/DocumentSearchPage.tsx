@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useFocusManagerContext } from '../context/FocusManagerContext';
 import { useMagnify } from '../hooks/useMagnify';
 import NavPad from '../components/common/NavPad';
 import StepIndicator from '../components/common/StepIndicator';
@@ -114,6 +115,8 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
   allCertificates, onHome, onToggleTts, onToggleMagnify,
   onCertificateConfirmed, onCategorySearch,
 }) => {
+  const fm = useFocusManagerContext();
+
   const [koState, setKoState] = useState<KoState>(KO_INIT);
   const [enQuery, setEnQuery] = useState('');
   const [confirmCert, setConfirmCert] = useState<Certificate | null>(null);
@@ -122,6 +125,41 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
 
   const kbRows = kbMode === 'ko' ? KO_ROWS : EN_ROWS;
   const query = kbMode === 'ko' ? koStr(koState) : enQuery;
+
+  const kbChars = useMemo(() => kbRows.flat(), [kbMode]);
+
+  const results = useMemo<Certificate[]>(() => {
+      if (!query.trim()) return [];
+      const q = query.toLowerCase();
+      return allCertificates.filter(c =>
+        c.nameKo.includes(q) ||
+        c.nameEn?.toLowerCase().includes(q) ||
+        c.nameJa?.includes(q) ||
+        c.nameZh?.includes(q)
+      );
+  }, [query, allCertificates]);
+
+  useEffect(() => {
+        fm.initTabGroup(document, 'keyboard', { tabRotation: false, playTtsOnMoved: true });
+        fm.registerGroupChain('keyboard',  { next: 'bottombar', prev: 'bottombar' });
+        fm.registerGroupChain('bottombar', { next: 'keyboard',  prev: 'keyboard'  });
+        fm.activateFocusMode('keyboard', 0);
+    }, []);
+
+    useEffect(() => {
+      fm.activateFocusMode('keyboard', 0);
+    }, [kbMode]);
+
+    useEffect(() => {
+        if (results.length > 0) {
+          fm.registerGroupChain('keyboard',   { next: 'doc-search', prev: 'bottombar' });
+          fm.registerGroupChain('doc-search', { next: 'bottombar',  prev: 'keyboard'  });
+          fm.registerGroupChain('bottombar',  { next: 'keyboard',   prev: 'doc-search' });
+        } else {
+          fm.registerGroupChain('keyboard',  { next: 'bottombar', prev: 'bottombar' });
+          fm.registerGroupChain('bottombar', { next: 'keyboard',  prev: 'keyboard'  });
+        }
+    }, [results.length]);
 
   const append = (ch: string) => {
     if (kbMode === 'ko') setKoState(s => koAdd(s, ch));
@@ -138,17 +176,6 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
   };
 
   const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
-
-  const results = useMemo<Certificate[]>(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
-    return allCertificates.filter(c =>
-      c.nameKo.includes(q) ||
-      c.nameEn?.toLowerCase().includes(q) ||
-      c.nameJa?.includes(q) ||
-      c.nameZh?.includes(q)
-    );
-  }, [query]);
 
   return (
     <div className="kiosk-root">
@@ -185,6 +212,10 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
                     className="key-btn"
                     onClick={() => append(ch)}
                     aria-label={ch}
+                    data-tabfocus="Y"
+                    data-tabgroup="keyboard"
+                    data-ttsmsg={ch}
+                    tabIndex={kbChars.indexOf(ch)}
                   >
                     {ch}
                   </button>
@@ -192,14 +223,38 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
               </div>
             ))}
             <div className="keyboard-actions">
-              <button className="kb-action-btn category" style={{ flex: 1 }} onClick={onCategorySearch}>
+              <button
+                className="kb-action-btn category"
+                style={{ flex: 1 }}
+                onClick={onCategorySearch}
+                data-tabfocus="Y"
+                data-tabgroup="keyboard"
+                data-ttsmsg="카테고리 검색"
+                tabIndex={kbChars.length}
+              >
                 <img src={imgSearch} alt="search" />
                 카테고리 검색
               </button>
-              <button className="kb-action-btn" style={{ flex: 1, background: 'var(--navy)', color: 'var(--white)' }} onClick={switchMode}>
+              <button
+                className="kb-action-btn"
+                style={{ flex: 1, background: 'var(--navy)', color: 'var(--white)' }}
+                onClick={switchMode}
+                data-tabfocus="Y"
+                data-tabgroup="keyboard"
+                data-ttsmsg={kbMode === 'ko' ? 'English' : '한국어'}
+                tabIndex={kbChars.length + 1}
+              >
                 {kbMode === 'ko' ? 'English' : '한국어'}
               </button>
-              <button className="kb-action-btn delete" style={{ flex: 1 }} onClick={backspace}>
+              <button
+                className="kb-action-btn delete"
+                style={{ flex: 1 }}
+                onClick={backspace}
+                data-tabfocus="Y"
+                data-tabgroup="keyboard"
+                data-ttsmsg="지우기"
+                tabIndex={kbChars.length + 2}
+              >
                 <img src={imgDelete} alt="delete" />
                 지우기
               </button>
