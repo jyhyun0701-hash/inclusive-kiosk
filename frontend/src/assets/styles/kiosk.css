@@ -519,7 +519,7 @@ html, body {
   justify-content: space-between;
   margin-top: 18px;
   gap: 30px;
-  padding-bottom: 50px;
+  padding-bottom: 40px;
   border-bottom: 3px solid #ccc;
 }
 .kb-action-btn {
