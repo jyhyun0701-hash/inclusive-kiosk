@@ -42,11 +42,13 @@ type Screen =
   | { id: 'issuance'; certificate: Certificate };
 
 // ── TTS ────────────────────────────────────────────
-const speak = (text: string, lang: Language) => {
+const speak = (text: string, lang: Language, enabled = true) => {
+  if (!enabled) return;
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
 
   setTimeout(() => {
+    if (!enabled) return;
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US';
     u.rate = 0.95;
@@ -105,7 +107,7 @@ const App: React.FC = () => {
 
  // 화면 전환 + TTS + 포커스 진입을 함께 처리하는 헬퍼
  const goTo = useCallback((nextScreen: Screen, ttsMsg?: string, group = 'main', tabindex = 0) => {
-   if (ttsMsg) speak(ttsMsg, language);
+   if (ttsMsg) speak(ttsMsg, language, isTtsOn);
    setupGroupsForScreen(nextScreen.id);
    setScreen(nextScreen);
    if (isTtsOn) {
@@ -170,7 +172,7 @@ const closeKeypad = useCallback(() => {
     setIsTtsOn(next);
     setGlobalTts(next);
     if (next) {
-      speak('접근성 모드가 활성화되었습니다.', language);
+      speak('접근성 모드가 활성화되었습니다.', language, next);
       setupGroupsForScreen(screen.id);
       const firstGroup = getFirstGroupForScreen(screen.id);
       setTimeout(() => fm.activateFocusMode(firstGroup, 0), 300);
