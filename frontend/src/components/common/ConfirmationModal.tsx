@@ -3,6 +3,7 @@ import type { Certificate, Language } from '../../types/kiosk';
 import { getCertName } from '../../types/kiosk';
 import imgPopupInfo from  '../../assets/images/popup-info.png';
 import { useFocusManagerContext } from '../../context/FocusManagerContext';
+import { speakAndThen } from './../../utils/speakSafe';
 
 interface ConfirmationModalProps {
   certificate: Certificate;
@@ -55,8 +56,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     }
 
     fm.initTabGroup(document, 'modal-confirm', { tabRotation: true, playTtsOnMoved: true });
-    if (fm.isActive()) fm.switchGroup('modal-confirm', 0);
-  }, []);
+
+    if (fm.isActive()) {
+        // 모달 내용 발화 → 완료 후 발급 버튼 포커스 + 발화
+        const content = l.body(certName).replace(/\n/g, ' ');
+        speakAndThen(content, () => fm.switchGroup('modal-confirm', 0));
+      }
+    }, []);
 
   // 취소: 먼저 상태 변경(onCancel) → double rAF 후 트리거 버튼으로 포커스 복원
   const handleCancel = useCallback(() => {

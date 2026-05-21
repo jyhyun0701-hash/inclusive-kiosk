@@ -1,11 +1,13 @@
 let globalTtsEnabled = false;
-let lastMsg = '';
+let pendingMsg = '';
+let pendingTimer: ReturnType<typeof setTimeout> | null = null;
 
 export const setGlobalTts = (enabled: boolean) => {
   globalTtsEnabled = enabled;
   if (!enabled) {
+    if (pendingTimer !== null) { clearTimeout(pendingTimer); pendingTimer = null; }
+    pendingMsg = '';
     window.speechSynthesis?.cancel();
-    lastMsg = '';
   }
 };
 
@@ -19,68 +21,82 @@ function getKoVoice(): SpeechSynthesisVoice | null {
   );
 }
 
-function makeUtt(msg: string): SpeechSynthesisUtterance {
+function doSpeak(msg: string, onEnd?: () => void) {
+  if (!window.speechSynthesis) return;
   const utt = new SpeechSynthesisUtterance(msg);
-  utt.lang   = 'ko-KR';
-  utt.rate   = 0.9;
-  utt.volume = 1.0;
+  utt.lang = 'ko-KR'; utt.rate = 0.9; utt.volume = 1.0;
   const voice = getKoVoice();
   if (voice) utt.voice = voice;
 
-  // 수정: cancel() 시 onerror('interrupted')가 발생하므로 여기서도 초기화
-  utt.onend   = () => { lastMsg = ''; };
-  utt.onerror = (e) => {
-    if (e.error !== 'interrupted') {
-      console.warn('[TTS] error:', e.error);
-    }
-    lastMsg = '';  // ← 핵심 추가: cancel 후 같은 메시지 재발화 가능하게
+  utt.onend = () => {
+    if (pendingMsg === msg) pendingMsg = '';
+    onEnd?.();
   };
-  return utt;
+  utt.onerror = (e) => {
+    if (e.error !== 'canceled' && e.error !== 'interrupted') console.warn('[TTS]', e.error);
+    if (pendingMsg === msg) pendingMsg = '';
+    onEnd?.();
+  };
+
+  if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+  window.speechSynthesis.speak(utt);
 }
 
-/**
- * 우선 발화 — 기존 취소 후 즉시 재생
- * ✅ 수정: globalTtsEnabled 체크 추가 (TTS 꺼진 상태에서 호출 방지)
- */
-export const speakPriority = (msg: string) => {
-  if (!globalTtsEnabled) return;  // ← 추가
-  if (!window.speechSynthesis || !msg.trim()) return;
+export const speakSafe = (msg: string) => {
+  if (!globalTtsEnabled || !window.speechSynthesis || !msg.trim()) return;
+  if (pendingMsg === msg) return;
 
-  window.speechSynthesis.cancel();
-  lastMsg = msg;
+  if (pendingTimer !== null) { clearTimeout(pendingTimer); pendingTimer = null; }
+  pendingMsg = msg;
 
-  setTimeout(() => {
-    if (window.speechSynthesis.paused) window.speechSynthesis.resume();
-    window.speechSynthesis.speak(makeUtt(msg));
-  }, 50);
+  if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+    window.speechSynthesis.cancel();
+  }
+
+  pendingTimer = setTimeout(() => {
+    pendingTimer = null;
+    if (!globalTtsEnabled || pendingMsg !== msg) return;
+    doSpeak(msg);
+  }, 100);
 };
 
-/**
- * 일반 발화 — TTS 꺼진 상태면 완전 차단
- */
-export const speakSafe = (msg: string) => {
-  if (!globalTtsEnabled) return;
-  if (!window.speechSynthesis || !msg.trim()) return;
-  if (lastMsg === msg) return;
-
+export const speakPriority = (msg: string) => {
+  if (!globalTtsEnabled || !window.speechSynthesis || !msg.trim()) return;
+  if (pendingTimer !== null) { clearTimeout(pendingTimer); pendingTimer = null; }
+  pendingMsg = msg;
   window.speechSynthesis.cancel();
-  lastMsg = msg;
+  setTimeout(() => doSpeak(msg), 50);
+};
 
-  setTimeout(() => {
-    if (window.speechSynthesis.paused) window.speechSynthesis.resume();
-    window.speechSynthesis.speak(makeUtt(msg));
-  }, 50);
+/** 내용 발화 완료 후 콜백 실행 (모달 오픈 시 사용) */
+export const speakAndThen = (msg: string, callback: () => void) => {
+  if (!globalTtsEnabled || !window.speechSynthesis || !msg.trim()) {
+    callback();
+    return;
+  }
+
+  if (pendingTimer !== null) { clearTimeout(pendingTimer); pendingTimer = null; }
+  pendingMsg = msg;
+
+  if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+    window.speechSynthesis.cancel();
+  }
+
+  pendingTimer = setTimeout(() => {
+    pendingTimer = null;
+    if (!globalTtsEnabled || pendingMsg !== msg) { callback(); return; }
+    doSpeak(msg, callback);
+  }, 100);
 };
 
 export const stopSpeak = () => {
+  if (pendingTimer !== null) { clearTimeout(pendingTimer); pendingTimer = null; }
+  pendingMsg = '';
   window.speechSynthesis?.cancel();
-  lastMsg = '';
 };
 
 export const initSpeech = () => {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.getVoices();
-  window.speechSynthesis.onvoiceschanged = () => {
-    window.speechSynthesis.getVoices();
-  };
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 };

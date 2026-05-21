@@ -2,10 +2,13 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import imgKeypadInfo from '../../assets/images/keypad-info.png';
 import imgPopupInfo from  '../../assets/images/popup-info.png';
 import { useFocusManagerContext } from '../../context/FocusManagerContext';
+import { speakAndThen } from '../../utils/speakSafe';
 
 interface InfoModalProps {
   onClose: () => void;
 }
+
+const INFO_TTS = '키오스크 하단에 위치한 음성 켜기 버튼 입력 시, 키패드 기능과 음성 안내 기능이 활성화됩니다. 키패드의 상측, 하측 버튼은 항목 이동시에 사용하며, 원형 버튼은 입력시 사용합니다.';
 
 const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
   const fm = useFocusManagerContext();
@@ -21,8 +24,12 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
     }
 
     fm.initTabGroup(document, 'modal-info', { tabRotation: false, playTtsOnMoved: true });
-    if (fm.isActive()) fm.switchGroup('modal-info', 0);
-  }, []);
+
+    if (fm.isActive()) {
+        // 안내 내용 발화 → 완료 후 확인 버튼 포커스 + 발화
+        speakAndThen(INFO_TTS, () => fm.switchGroup('modal-info', 0));
+      }
+    }, []);
 
   const handleClose = useCallback(() => {
     onClose(); // 먼저 상태 변경 (React re-render 예약)
