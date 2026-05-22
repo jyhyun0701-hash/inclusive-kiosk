@@ -99,7 +99,7 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
         </div>
       </main>
 
-      {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
+      {showInfo && <InfoModal onClose={() => setShowInfo(false)} language={language} />}
 
       <BottomBar
         language={language}

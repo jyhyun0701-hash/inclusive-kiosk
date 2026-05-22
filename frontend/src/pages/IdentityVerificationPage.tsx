@@ -277,7 +277,8 @@ const IdentityVerificationPage: React.FC<Props> = ({
         </div>
       </main>
 
-      {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
+      {showInfo && <InfoModal onClose={() => setShowInfo(false)} language={language} />}
+
       <BottomBar
         language={language}
         isTtsOn={isTtsOn}

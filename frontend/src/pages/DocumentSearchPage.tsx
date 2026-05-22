@@ -109,6 +109,12 @@ const NO_RESULT: Record<Language, string> = {
   ja: '検索結果がありません。',
   zh: '没有搜索结果。',
 };
+const ACTION_LABELS: Record<Language, { category: string; delete: string }> = {
+  ko: {category: '카테고리 검색', delete: '지우기'},
+  en: { category: 'Category Search', delete: 'Delete' },
+  ja: { category: 'カテゴリ検索', delete: '削除' },
+  zh: { category: '类别搜索', delete: '删除' },
+}
 
 const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
   language, isTtsOn, isMagnified,
@@ -121,7 +127,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
   const [enQuery, setEnQuery] = useState('');
   const [confirmCert, setConfirmCert] = useState<Certificate | null>(null);
   const [showInfo, setShowInfo] = useState(false);
-  const [kbMode, setKbMode] = useState<'ko' | 'en'>('ko');
+  const [kbMode, setKbMode] = useState<'ko' | 'en'>(language === 'ko' ? 'ko' : 'en');
 
   const kbRows = kbMode === 'ko' ? KO_ROWS : EN_ROWS;
   const query = kbMode === 'ko' ? koStr(koState) : enQuery;
@@ -152,6 +158,12 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
       if (!isTtsOn) return;
       fm.activateFocusMode('keyboard', 0);
     }, [kbMode]);
+
+    useEffect(() => {
+      setKbMode(language === 'ko' ? 'ko' : 'en');
+      setKoState(KO_INIT);
+      setEnQuery('');
+    }, [language]);
 
     useEffect(() => {
       if (!isTtsOn) return;
@@ -233,11 +245,11 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
                 onClick={onCategorySearch}
                 data-tabfocus="Y"
                 data-tabgroup="keyboard"
-                data-ttsmsg="카테고리 검색"
+                data-ttsmsg={ACTION_LABELS[language].category}
                 tabIndex={kbChars.length}
               >
                 <img src={imgSearch} alt="search" />
-                카테고리 검색
+                {ACTION_LABELS[language].category}
               </button>
               <button
                 className="kb-action-btn"
@@ -260,7 +272,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
                 tabIndex={kbChars.length + 2}
               >
                 <img src={imgDelete} alt="delete" />
-                지우기
+                  {ACTION_LABELS[language].delete}
               </button>
             </div>
           </div>
@@ -299,7 +311,8 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
           onCancel={() => setConfirmCert(null)}
         />
       )}
-      {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
+
+      {showInfo && <InfoModal onClose={() => setShowInfo(false)} language={language} />}
 
       <BottomBar
         language={language}
