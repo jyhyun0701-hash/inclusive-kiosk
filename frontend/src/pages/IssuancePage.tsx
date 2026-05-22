@@ -34,8 +34,8 @@ const DONE_LABELS: Record<Language, {
 const HEADER: Record<IssueStep, Record<Language, string>> = {
   preparing: {
     ko: '문서 출력을 준비하고 있습니다. \n잠시만 기다려주십시오.',
-    en: 'Preparing your document. Please wait.',
-    ja: '書類の印刷を準備しています。しばらくお待ちください。',
+    en: 'Preparing your document. \nPlease wait.',
+    ja: '書類の印刷を準備しています。\nしばらくお待ちください。',
     zh: '正在准备打印文件，请稍候。',
   },
   printing: {
@@ -118,7 +118,12 @@ const IssuancePage: React.FC<Props> = ({
           {step !== 'done' ? (
             <div className={`fingerprint-area${step === 'printing' ? ' printing' : ''}`}>
               <div className="status-card printing" style={{ width: '100%' }}>
-                {HEADER[step][language]}
+                {HEADER[step][language].split('\n').map((line, i, arr) => (
+                  <React.Fragment key={i}>
+                    {line}
+                    {i < arr.length - 1 && <br />}
+                  </React.Fragment>
+                ))}
               </div>
               <div className="fingerprint-icon">
                 <img src={imgPrint} alt="print" />
