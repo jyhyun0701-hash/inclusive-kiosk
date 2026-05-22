@@ -9,7 +9,7 @@ import IdentityVerificationPage from './pages/IdentityVerificationPage';
 import IssuancePage from './pages/IssuancePage';
 import VirtualKeypad, { type KeypadKey } from './components/common/VirtualKeypad';
 import { useFocusManagerContext } from './context/FocusManagerContext';
-import { setGlobalTts} from './utils/speakSafe';
+import { setGlobalTts, speakSafe, getPageHelpText} from './utils/speakSafe';
 import { useCertificates } from './hooks/useCertificates';
 
 import {
@@ -65,6 +65,7 @@ const App: React.FC = () => {
   // App 컴포넌트 내부
   const keypadWindowRef = useRef<Window | null>(null);
   const channelRef      = useRef<BroadcastChannel | null>(null);
+  const numpadCancelRef = useRef<(() => void) | null>(null);
 
   const handleKeypadKeyRef = useRef<((key: KeypadKey) => void) | null>(null);
   const handleToggleTtsRef = useRef<(() => void) | null>(null);
@@ -106,11 +107,17 @@ const App: React.FC = () => {
   }, [fm]);
 
  // 화면 전환 + TTS + 포커스 진입을 함께 처리하는 헬퍼
- const goTo = useCallback((nextScreen: Screen, ttsMsg?: string, group = 'main', tabindex = 0) => {
+ const goTo = useCallback((
+   nextScreen: Screen,
+   ttsMsg?: string,
+   group = 'main',
+   tabindex = 0,
+   selfManaged = false
+ ) => {
    if (ttsMsg) speak(ttsMsg, language, isTtsOn);
    setupGroupsForScreen(nextScreen.id);
    setScreen(nextScreen);
-   if (isTtsOn) {
+   if (isTtsOn && !selfManaged) {
      setTimeout(() => fm.activateFocusMode(group, tabindex), 400);
    }
  }, [language, isTtsOn, fm, setupGroupsForScreen]);
@@ -198,8 +205,19 @@ const closeKeypad = useCallback(() => {
       case 'NAVUP':       fm.moveByCurrentGroup('UP');   break;
       case 'NAVDOWN':     fm.moveByCurrentGroup('DOWN'); break;
       case 'NAVENTER':    (document.activeElement as HTMLElement)?.click(); break;
-      case 'KEY_CANCEL':  goHome(); break;
+      case 'KEY_CANCEL':
+        if (numpadCancelRef.current) {
+          numpadCancelRef.current(); // 본인확인 숫자 입력 중 - 전체 지우기
+        } else {
+          goHome();
+        }
+        break;
       case 'KEY_LISTEN':  fm.readCurrentFocus(); break;
+      case 'NAVHELP': {   // ? 버튼: 현재 페이지 단계 안내 발화
+            const helpText = getPageHelpText();
+            if (helpText) speakSafe(helpText);
+            break;
+          }
       case 'KEY_CORRECT': {
         // numpad의 del 버튼 (tabIndex=9) 클릭
         const delBtn = document.querySelector<HTMLElement>('[data-tabgroup="numpad"][tabindex="9"]');
@@ -216,10 +234,15 @@ const closeKeypad = useCallback(() => {
     }
   }, [fm, goHome]);
 
+  const handleRegisterNumpadCancel = useCallback((fn: (() => void) | null) => {
+    numpadCancelRef.current = fn;
+  }, []);
+
   const common = {
     language, isTtsOn, isMagnified,
     onToggleTts: handleToggleTts,
     onToggleMagnify: handleToggleMagnify,
+    onRegisterNumpadCancel: handleRegisterNumpadCancel,
   };
 
   const renderPage = () => {
@@ -232,7 +255,7 @@ const closeKeypad = useCallback(() => {
             onLanguageChange={(lang) => { setLanguage(lang); }}
             onCertificateSelect={(certId) => {
               const cert = quickCertificates.find(c => c.id === certId)!;
-              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo}이 선택되었습니다.`, 'numpad', 0);
+              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo}이 선택되었습니다.`, 'numpad', 0, true);
             }}
             onMoreCertificates={() => {
               goTo({ id: 'cert-list' }, '증명서 전체 목록 화면으로 이동합니다.', 'cert-list-top', 0);
@@ -250,7 +273,7 @@ const closeKeypad = useCallback(() => {
               goTo({ id: 'category-search' }, '카테고리 검색 화면으로 이동합니다.', 'category', 0);
             }}
             onCertificateSelect={(cert) => {
-              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'numpad', 0);
+              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'numpad', 0, true);
             }}
             onSearchClick={() => goTo({ id: 'doc-search' }, '문서 검색 화면으로 이동합니다.', 'doc-search', 0)}
           />
@@ -264,7 +287,7 @@ const closeKeypad = useCallback(() => {
             initialCategory={screen.initialCategory}
             onHome={goHome}
             onCertificateConfirmed={(cert) => {
-              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'numpad', 0);
+              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'numpad', 0, true);
             }}
             onSearchClick={() => goTo({ id: 'doc-search' }, undefined, 'doc-search', 0)}
           />
@@ -277,7 +300,7 @@ const closeKeypad = useCallback(() => {
             allCertificates={allCertificates}
             onHome={goHome}
             onCertificateConfirmed={(cert) => {
-              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'numpad', 0);
+              goTo({ id: 'identity', certificate: cert }, `${cert.nameKo} 발급을 진행합니다.`, 'numpad', 0, true);
             }}
             onCategorySearch={() => goTo({ id: 'category-search' }, undefined, 'category-search', 0)}
           />
@@ -293,7 +316,7 @@ const closeKeypad = useCallback(() => {
               goTo(
                 { id: 'issuance', certificate: screen.certificate },
                 '본인 확인이 완료되었습니다. 문서를 출력합니다.',
-                'bottombar', 0
+                'bottombar', 0, true
               );
             }}
           />

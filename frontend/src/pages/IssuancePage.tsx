@@ -6,6 +6,7 @@ import BottomBar from '../components/common/BottomBar';
 import type { Language, Certificate } from '../types/kiosk';
 import { getCertName } from '../types/kiosk';
 import { useFocusManagerContext } from '../context/FocusManagerContext';
+import { speakSafe, speakAndThen, setPageHelpText } from '../utils/speakSafe';
 import imgPrint from '../assets/images/print.png';
 
 type IssueStep = 'preparing' | 'printing' | 'done';
@@ -32,13 +33,13 @@ const DONE_LABELS: Record<Language, {
 
 const HEADER: Record<IssueStep, Record<Language, string>> = {
   preparing: {
-    ko: '문서 출력을 준비하고 있습니다. 잠시만 기다려주십시오.',
+    ko: '문서 출력을 준비하고 있습니다. \n잠시만 기다려주십시오.',
     en: 'Preparing your document. Please wait.',
     ja: '書類の印刷を準備しています。しばらくお待ちください。',
     zh: '正在准备打印文件，请稍候。',
   },
   printing: {
-    ko: '문서가 출력되고 있습니다. 잠시만 기다려주십시오.',
+    ko: '문서가 출력되고 있습니다. \n잠시만 기다려주십시오.',
     en: 'Your document is being printed.',
     ja: '書類を印刷しています。',
     zh: '正在打印文件，请稍候。',
@@ -66,15 +67,33 @@ const IssuancePage: React.FC<Props> = ({
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
+  // 마운트 시 출력 준비중 안내
+  useEffect(() => {
+      if (isTtsOn) speakSafe(HEADER.preparing[language]);
+    }, []);
+
   // 발급 완료 단계 진입 시 영수증 발급 버튼으로 초기 포커스 이동
   useEffect(() => {
-    if (step === 'done' && isTtsOn) fm.activateFocusMode('issuance', 0);
-  }, [step, isTtsOn]);
+      if (step !== 'done') return;
+      if (isTtsOn) {
+        const msg = `${DONE_LABELS[language].complete} ${HEADER.done[language]}`;
+        speakAndThen(msg, () => fm.activateFocusMode('issuance', 0));
+      }
+  }, [step]);
 
   // 영수증 발급 후 처음으로 버튼(tabIndex=0으로 재배치)으로 포커스 이동
   useEffect(() => {
-    if (receiptPrinted && isTtsOn) fm.activateFocusMode('issuance', 0);
+      if (!receiptPrinted || !isTtsOn) return;
+      speakAndThen(
+        DONE_LABELS[language].receiptDone,
+        () => fm.activateFocusMode('issuance', 0)
+      );
   }, [receiptPrinted]);
+
+   // NAVHELP용 페이지 도움말 텍스트 업데이트
+    useEffect(() => {
+      setPageHelpText(HEADER[step][language]);
+    }, [step, language]);
 
   const dl = DONE_LABELS[language];
 
@@ -82,7 +101,14 @@ const IssuancePage: React.FC<Props> = ({
     <div className="kiosk-root">
       <header className="kiosk-header">
         <StepIndicator currentStep={step === 'done' ? 5 : 4} language={language} />
-        <div className="header-title">{HEADER[step][language]}</div>
+        <div className="header-title">
+          {HEADER[step][language].split('\n').map((line, i, arr) => (
+            <React.Fragment key={i}>
+              {line}
+              {i < arr.length -1 && <br />}
+            </React.Fragment>
+          ))}
+        </div>
       </header>
 
       <main className="kiosk-content content-verify">

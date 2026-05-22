@@ -7,7 +7,7 @@ import InfoModal from '../components/common/InfoModal';
 import NumPad from './../components/common/keyboards/NumPad';
 import type { Language, Certificate } from '../types/kiosk';
 import { useFocusManagerContext } from '../context/FocusManagerContext';
-import { speakSafe } from '../utils/speakSafe';
+import { speakSafe, speakAndThen, setPageHelpText } from '../utils/speakSafe';
 import imgFPSuccess from '../assets/images/fingerprint-success.png';
 import imgFPFail from '../assets/images/fingerprint-fail.png';
 import imgFPScan from '../assets/images/fingerprint-scan.png';
@@ -23,6 +23,7 @@ interface Props {
   onToggleTts: () => void;
   onToggleMagnify: () => void;
   onVerified: () => void;
+  onRegisterNumpadCancel: (fn: (() => void) | null) => void;
 }
 
 const ID_PLACEHOLDER: Record<Language, string> = {
@@ -87,7 +88,7 @@ const HEADER: Record<VerifyStep, Record<Language, string>> = {
     zh: '请重新将手指放在指纹识别器上。',
   },
   'fp-ok': {
-    ko: '문서 출력을 준비하고 있습니다. 잠시만 기다려주십시오.',
+    ko: '문서 출력을 준비하고 있습니다. \n잠시만 기다려주십시오.',
     en: 'Preparing to print. Please wait.',
     ja: '書類の印刷を準備しています。少々お待ちください。',
     zh: '正在准备打印文件，请稍候。',
@@ -105,6 +106,7 @@ const formatId = (v: string) => {
 const IdentityVerificationPage: React.FC<Props> = ({
   language, certificate, isTtsOn, isMagnified,
   onHome, onToggleTts, onToggleMagnify, onVerified,
+  onRegisterNumpadCancel,
 }) => {
   const fm = useFocusManagerContext();
   const { wrapRef, innerRef, navigate } = useMagnify(isMagnified);
@@ -112,39 +114,92 @@ const IdentityVerificationPage: React.FC<Props> = ({
   const [id, setId] = useState('');
   const [showInfo, setShowInfo] = useState(false);
 
+  // 단계 진입 음성 안내 발화 후 초기 포커스 발화
+  useEffect(() => {
+    if (!isTtsOn) return;
+    speakAndThen (
+      HEADER['id-input'][language],
+      () => fm.activateFocusMode('numpad', 0)
+      );
+  }, [isTtsOn]);
+
+  // 그룹 체인 등록 (step 변경 시)
   useEffect(() => {
     if (step === 'fp-fail') {
-      fm.registerGroupChain('bottombar', { next: 'identity', prev: 'identity' });
-      fm.registerGroupChain('identity',  { next: 'bottombar', prev: 'bottombar' });
-      if (isTtsOn) setTimeout(() => fm.activateFocusMode('identity', 0), 300);
+      fm.registerGroupChain('bottombar', { next: 'identity', prev: 'identity'});
+      fm.registerGroupChain('identity', { next: 'bottombar', prev: 'bottombar'});
     } else if (step === 'id-input') {
-      fm.registerGroupChain('bottombar', { next: 'numpad', prev: 'numpad' });
-      fm.registerGroupChain('numpad',    { next: 'bottombar', prev: 'bottombar' });
+      fm.registerGroupChain('bottombar', { next: 'numpad', prev: 'numpad'});
+      fm.registerGroupChain('numpad', { next: 'bottombar', prev: 'bottombar'});
     }
-  }, [step, isTtsOn]);
+  }, [step]);
 
-  // 13자리 입력 완료 시 자동으로 지문 인식 단계로 진행
+  // step별 TTS 안내
+  useEffect(() => {
+    if (!isTtsOn) return;
+    switch (step) {
+      case 'fp-wait':
+        speakSafe(FP_STATUS.wait[language]);
+        break;
+      case 'fp-fail':
+        speakAndThen(
+          FP_STATUS.fail[language],
+          () => fm.activateFocusMode('identity', 0)
+        );
+        break;
+    }
+  }, [step]);
+
+  // NAVHELP용 페이지 도움말 텍스트 업데이트
+  useEffect(() => {
+    setPageHelpText(HEADER[step][language]);
+  }, [step, language]);
+
+  // 취소 = 전체 지우기 등록 (id-input 단계만)
+  useEffect(() => {
+    if (step === 'id-input') {
+      onRegisterNumpadCancel(() => {
+        setId('');
+        speakAndThen('입력이 모두 지워졌습니다.', () => fm.activateFocusMode('numpad', 0));
+      });
+    } else {
+      onRegisterNumpadCancel(null);
+    }
+    return () => onRegisterNumpadCancel(null);
+  }, [step]);
+
   useEffect(() => {
     if (step === 'id-input' && id.length === 13) setStep('fp-wait');
   }, [id, step]);
 
   // 지문 시뮬레이션
   useEffect(() => {
-    if (step === 'fp-wait') {
-      const t = setTimeout(() => setStep(Math.random() > 0.4 ? 'fp-ok' : 'fp-fail'), 3000);
-      return () => clearTimeout(t);
-    }
-    if (step === 'fp-ok') {
-      const t = setTimeout(onVerified, 1500);
-      return () => clearTimeout(t);
-    }
-  }, [step, onVerified]);
+      if (step === 'fp-wait') {
+        const t = setTimeout(() => setStep(Math.random() > 0.4 ? 'fp-ok' : 'fp-fail'), 3000);
+        return () => clearTimeout(t);
+      }
+      if (step === 'fp-ok') {
+        if (isTtsOn) {
+          speakAndThen(FP_STATUS.ok[language], () => setTimeout(onVerified, 300));
+        } else {
+          const t = setTimeout(onVerified, 1500);
+          return () => clearTimeout(t);
+        }
+      }
+  }, [step, onVerified, isTtsOn, language]);
 
   return (
     <div className="kiosk-root">
       <header className="kiosk-header">
         <StepIndicator currentStep={3} language={language} />
-        <div className="header-title">{HEADER[step][language]}</div>
+        <div className="header-title">
+          {HEADER[step][language].split('\n').map((line, i, arr) => (
+            <React.Fragment key={i}>
+              {line}
+              {i < arr.length -1 && <br />}
+            </React.Fragment>
+          ))}
+        </div>
       </header>
 
       <main className="kiosk-content content-verify">

@@ -8,7 +8,7 @@ interface InfoModalProps {
   onClose: () => void;
 }
 
-const INFO_TTS = '키오스크 하단에 위치한 음성 켜기 버튼 입력 시, 키패드 기능과 음성 안내 기능이 활성화됩니다. 키패드의 상측, 하측 버튼은 항목 이동시에 사용하며, 원형 버튼은 입력시 사용합니다.';
+const INFO_TTS = '키오스크 하단에 위치한 음성 켜기 버튼 입력 시, 키패드 기능과 음성 안내 기능이 활성화됩니다. 키패드의 상측, 하측 버튼은 항목 이동시에 사용하며, 원형 버튼은 입력시 사용합니다. 확인 버튼을 누르면 팝업창이 닫힙니다.';
 
 const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
   const fm = useFocusManagerContext();

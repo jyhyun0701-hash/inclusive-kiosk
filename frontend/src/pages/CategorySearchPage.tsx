@@ -4,6 +4,7 @@ import NavPad from '../components/common/NavPad';
 import { useFocusManagerContext } from '../context/FocusManagerContext';
 import StepIndicator from '../components/common/StepIndicator';
 import BottomBar from '../components/common/BottomBar';
+import { speakAndThen } from '../utils/speakSafe';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import InfoModal from '../components/common/InfoModal';
 import imgCategory from '../assets/images/category.png';
@@ -55,28 +56,40 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
   const [confirmCert, setConfirmCert] = useState<Certificate | null>(null);
   const [showInfo, setShowInfo] = useState(false);
 
+  // TTS 활성화 시에만 초기 포커스 설정
   useEffect(() => {
     if (!isTtsOn) return;
-    // search는 양쪽 케이스 공통
-    fm.registerGroupChain('search', { next: 'category', prev: 'bottombar' });
+    fm.registerGroupChain('search',    { next: 'category',  prev: 'bottombar' });
+    fm.registerGroupChain('category',  { next: 'bottombar', prev: 'search'    });
+    fm.registerGroupChain('bottombar', { next: 'search',    prev: 'category'  });
+    fm.activateFocusMode('category', 0); // isTtsOn 변경 시에만 초기 포커스
+  }, [isTtsOn]);
 
+  // 카테고리 선택 시 체인만 업데이트 (포커스는 handleCategoryClick이 처리)
+  useEffect(() => {
+    fm.registerGroupChain('search', { next: 'category', prev: 'bottombar' });
     if (selectedCategory) {
-      // 카테고리 + 상세 조회 표시
-      fm.registerGroupChain('category',   { next: 'sub-cert',   prev: 'search' });  // ← 'bottombar' → 'search'
-      fm.registerGroupChain('sub-cert',   { next: 'bottombar', prev: 'category' });
-      fm.registerGroupChain('bottombar', { next: 'search', prev: 'sub-cert'});
+      fm.registerGroupChain('category',  { next: 'sub-cert',  prev: 'search'   });
+      fm.registerGroupChain('sub-cert',  { next: 'bottombar', prev: 'category' });
+      fm.registerGroupChain('bottombar', { next: 'search',    prev: 'sub-cert' });
     } else {
-      // 카테고리만 표시
       fm.registerGroupChain('category',  { next: 'bottombar', prev: 'search'   });
-          fm.registerGroupChain('bottombar', { next: 'search',    prev: 'category' });
-      }
-      // TTS 켜질 때 초기 포커스를 category 첫 번째 항목으로
-      fm.activateFocusMode('category', 0);
-  }, [isTtsOn, selectedCategory]);
+      fm.registerGroupChain('bottombar', { next: 'search',    prev: 'category' });
+    }
+  }, [selectedCategory]); // ← activateFocusMode 없음
 
   const handleCategoryClick = (cat: CertificateCategory) => {
-    setSelectedCategory(prev => prev === cat ? null : cat);
+    const newCat = selectedCategory === cat ? null: cat;
+    setSelectedCategory(newCat);
     setHighlightedCertId(null);
+
+    if (isTtsOn && newCat !== null) {
+      const catLabel = CATEGORY_LABELS[cat]?.[language] ?? cat;
+      speakAndThen(
+        `${catLabel} 카테고리가 선택되었습니다.`,
+        () => fm.activateFocusMode('sub-cert', 0)
+      );
+    }
   };
 
   const handleCertClick = (cert: Certificate) => {

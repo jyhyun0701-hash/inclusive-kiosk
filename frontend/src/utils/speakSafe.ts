@@ -100,3 +100,8 @@ export const initSpeech = () => {
   window.speechSynthesis.getVoices();
   window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 };
+
+// 페이지별 도움말 텍스트 (NAVHELP용)
+let _pageHelpText = '';
+export const setPageHelpText = (text: string) => { _pageHelpText = text; };
+export const getPageHelpText = () => _pageHelpText;
