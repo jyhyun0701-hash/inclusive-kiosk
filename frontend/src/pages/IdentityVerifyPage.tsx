@@ -170,7 +170,7 @@ const IdentityVerifyPage = () => {
                     }}
                     disabled={key === '입력' && input.length !== 13}
                     data-tabfocus="Y" data-tabgroup="verify-keypad"
-                    tabIndex={getTabIdx(key, ri, ci)}
+                    tabindex={getTabIdx(key, ri, ci)}
                     data-ttsmsg={getTts(key)}
                     $action={key === '지우기' || key === '입력'}
                     $confirm={key === '입력'}
@@ -201,7 +201,7 @@ const IdentityVerifyPage = () => {
             <ScanArea
               onClick={scanStatus === 'idle' || scanStatus === 'failed' ? handleScan : undefined}
               $s={scanStatus}
-              data-tabfocus="Y" data-tabgroup="verify-fp" tabIndex={0}
+              data-tabfocus="Y" data-tabgroup="verify-fp" tabindex={0}
               data-ttsmsg="지문 인식. 지문 인식을 시작하려면 확인을 누르세요."
               role="button" aria-label="지문 인식 시작"
             >
@@ -214,7 +214,7 @@ const IdentityVerifyPage = () => {
             {scanStatus === 'failed' && (
               <RetryBtn
                 onClick={handleRetry}
-                data-tabfocus="Y" data-tabgroup="verify-fp" tabIndex={1}
+                data-tabfocus="Y" data-tabgroup="verify-fp" tabindex={1}
                 data-ttsmsg="다시 시도. 지문 인식을 다시 시도합니다."
               >
                 다시 시도하기

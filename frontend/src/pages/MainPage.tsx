@@ -80,7 +80,7 @@ const MainPage: React.FC<MainPageProps> = ({
                 data-tabfocus="Y"
                 data-tabgroup="main"
                 data-ttsmsg={getCertName(cert, language)}
-                tabIndex={idx}
+                tabindex={idx}
               >
                 {getCertName(cert, language)}
               </button>
@@ -92,7 +92,7 @@ const MainPage: React.FC<MainPageProps> = ({
               data-tabfocus= "Y"
               data-tabgroup="main"
               data-ttsmsg={MORE_LABEL[language]}
-              tabIndex={quickCertificates.length}
+              tabindex={quickCertificates.length}
             >
               {MORE_LABEL[language]}
             </button>
@@ -107,7 +107,7 @@ const MainPage: React.FC<MainPageProps> = ({
                 data-tabfocus="Y"
                 data-tabgroup="lang"
                 data-ttsmsg={l.label}
-                tabIndex={idx}
+                tabindex={idx}
                 aria-label={l.label}
                 aria-pressed={language === l.code}
               >

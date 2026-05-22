@@ -39,7 +39,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
         data-tabfocus="Y"
         data-tabgroup="bottombar"
         data-ttsmsg={l.home}
-        tabIndex={0}
+        tabindex={0}
         aria-label={l.home}
       >
         <img src={imgHome} alt="" />
@@ -53,7 +53,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
         data-tabfocus="Y"
         data-tabgroup="bottombar"
         data-ttsmsg={l.info}
-        tabIndex={1}
+        tabindex={1}
         aria-label={l.info}
       >
        <img src={imgInfo} alt="" />
@@ -67,7 +67,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
         data-tabfocus="Y"
         data-tabgroup="bottombar"
         data-ttsmsg={isTtsOn ? l.ttsOff : l.ttsOn}
-        tabIndex={2}
+        tabindex={2}
         aria-label={isTtsOn ? l.ttsOff : l.ttsOn}
         aria-pressed={isTtsOn}
       >
@@ -82,7 +82,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
         data-tabfocus="Y"
         data-tabgroup="bottombar"
         data-ttsmsg={l.magnify}
-        tabIndex={3}
+        tabindex={3}
         aria-label={l.magnify}
         aria-pressed={isMagnified}
       >
