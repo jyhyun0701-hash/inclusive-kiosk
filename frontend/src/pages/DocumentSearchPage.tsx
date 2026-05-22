@@ -231,7 +231,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
                     data-tabfocus="Y"
                     data-tabgroup="keyboard"
                     data-ttsmsg={ch}
-                    tabIndex={kbChars.indexOf(ch)}
+                    tabindex={kbChars.indexOf(ch)}
                   >
                     {ch}
                   </button>
@@ -246,7 +246,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
                 data-tabfocus="Y"
                 data-tabgroup="keyboard"
                 data-ttsmsg={ACTION_LABELS[language].category}
-                tabIndex={kbChars.length}
+                tabindex={kbChars.length}
               >
                 <img src={imgSearch} alt="search" />
                 {ACTION_LABELS[language].category}
@@ -258,7 +258,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
                 data-tabfocus="Y"
                 data-tabgroup="keyboard"
                 data-ttsmsg={kbMode === 'ko' ? 'English' : '한국어'}
-                tabIndex={kbChars.length + 1}
+                tabindex={kbChars.length + 1}
               >
                 {kbMode === 'ko' ? 'English' : '한국어'}
               </button>
@@ -269,7 +269,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
                 data-tabfocus="Y"
                 data-tabgroup="keyboard"
                 data-ttsmsg="지우기"
-                tabIndex={kbChars.length + 2}
+                tabindex={kbChars.length + 2}
               >
                 <img src={imgDelete} alt="delete" />
                   {ACTION_LABELS[language].delete}
@@ -289,7 +289,7 @@ const DocumentSearchPage: React.FC<DocumentSearchPageProps> = ({
                   data-tabfocus="Y"
                   data-tabgroup="doc-search"
                   data-ttsmsg={getCertName(cert, language)}
-                  tabIndex={idx}
+                  tabindex={idx}
                 >
                   {getCertName(cert, language)}
                 </button>

@@ -81,7 +81,7 @@ const IssuancePage: React.FC<Props> = ({
       }
   }, [step]);
 
-  // 영수증 발급 후 처음으로 버튼(tabIndex=0으로 재배치)으로 포커스 이동
+  // 영수증 발급 후 처음으로 버튼(tabindex=0으로 재배치)으로 포커스 이동
   useEffect(() => {
       if (!receiptPrinted || !isTtsOn) return;
       speakAndThen(
@@ -142,7 +142,7 @@ const IssuancePage: React.FC<Props> = ({
                   data-tabfocus="Y"
                   data-tabgroup="issuance"
                   data-ttsmsg={dl.receipt}
-                  tabIndex={0}
+                  tabindex={0}
                 >
                   {dl.receipt}
                 </button>
@@ -159,7 +159,7 @@ const IssuancePage: React.FC<Props> = ({
                 data-tabfocus="Y"
                 data-tabgroup="issuance"
                 data-ttsmsg={dl.goHome}
-                tabIndex={receiptPrinted ? 0 : 1}
+                tabindex={receiptPrinted ? 0 : 1}
               >
                 {dl.goHome}
               </button>

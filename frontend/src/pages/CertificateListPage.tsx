@@ -60,7 +60,7 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
               data-tabfocus="Y"
               data-tabgroup="cert-list-top"
               data-ttsmsg={LABEL_CATEGORY[language]}
-              tabIndex={0}
+              tabindex={0}
             >
                <img src={imgSearch} alt="search" />
                {LABEL_CATEGORY[language]}
@@ -71,7 +71,7 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
               data-tabfocus="Y"
               data-tabgroup="cert-list-top"
               data-ttsmsg={LABEL_SEARCH[language]}
-              tabIndex={1}
+              tabindex={1}
             >
               <img src={imgSearch} alt="search" />
               {LABEL_SEARCH[language]}
@@ -89,7 +89,7 @@ const CertificateListPage: React.FC<CertificateListPageProps> = ({
                 data-tabfocus="Y"
                 data-tabgroup="cert-list"
                 data-ttsmsg={getCertName(cert, language)}
-                tabIndex={idx}
+                tabindex={idx}
               >
                 {getCertName(cert, language)}
               </button>

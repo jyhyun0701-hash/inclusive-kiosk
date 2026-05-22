@@ -30,7 +30,7 @@ const CertificateList = ({ certificates, onSelect }: CertificateListProps) => {
           key={cert.id}
           role="listitem"
           onClick={() => handleClick(cert)}
-          tabIndex={0}
+          tabindex={0}
           aria-label={`${cert.nameKo}, 수수료 ${cert.fee ? cert.fee + '원' : '무료'}`}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {

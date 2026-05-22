@@ -70,7 +70,7 @@ const FingerprintScanner = ({ onSuccess }: FingerprintScannerProps) => {
             ? '지문 인식 시작 (클릭 또는 Enter)'
             : '지문 인식 중'
         }
-        tabIndex={status === 'idle' || status === 'failed' ? 0 : -1}
+        tabindex={status === 'idle' || status === 'failed' ? 0 : -1}
         $status={status}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {

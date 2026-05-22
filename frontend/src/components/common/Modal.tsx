@@ -92,7 +92,7 @@ const Modal = ({
 						onClick={onConfirm}
 						data-tabfocus="Y"
 						data-tabgroup="modal"
-						tabIndex={0}
+						tabindex={0}
 						data-ttsmsg={`${confirmLabel}. ${confirmLabel}을 진행합니다.`}
 						aria-label={confirmLabel}
 					>
@@ -102,7 +102,7 @@ const Modal = ({
 						onClick={onCancel}
 						data-tabfocus="Y"
 						data-tabgroup="modal"
-						tabIndex={1}
+						tabindex={1}
 						data-ttsmsg={`${cancelLabel}. 취소합니다.`}
 						aria-label={cancelLabel}
 					>

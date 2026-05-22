@@ -120,7 +120,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
             data-tabfocus="Y"
             data-tabgroup="search"
             data-ttsmsg={SECTION[language].search}
-            tabIndex={0}
+            tabindex={0}
           >
             <img src={imgSearch} alt="search" />
             {SECTION[language].search}
@@ -144,7 +144,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
                 data-tabfocus="Y"
                 data-tabgroup="category"
                 data-ttsmsg={CATEGORY_LABELS[cat]?.[language] ?? cat}
-                tabIndex={idx}
+                tabindex={idx}
               >
                 {CATEGORY_LABELS[cat]?.[language] ?? cat}
               </button>
@@ -168,7 +168,7 @@ const CategorySearchPage: React.FC<CategorySearchPageProps> = ({
                     data-tabfocus="Y"
                     data-tabgroup="sub-cert"
                     data-ttsmsg={getCertName(cert, language)}
-                    tabIndex={idx}
+                    tabindex={idx}
                   >
                     {getCertName(cert, language)}
                   </button>

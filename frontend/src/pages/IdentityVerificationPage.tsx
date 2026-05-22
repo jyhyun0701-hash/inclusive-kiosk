@@ -253,7 +253,7 @@ const IdentityVerificationPage: React.FC<Props> = ({
                   data-tabfocus="Y"
                   data-tabgroup="identity"
                   data-ttsmsg={RETRY_LABEL[language]}
-                  tabIndex={0}
+                  tabindex={0}
                 >
                   {RETRY_LABEL[language]}
                 </button>

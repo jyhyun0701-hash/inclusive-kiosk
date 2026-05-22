@@ -48,7 +48,7 @@ const NumPad: React.FC<NumPadProps> = ({ value, onChange, onConfirm, maxLength =
               data-tabfocus="Y"
               data-tabgroup="numpad"
               data-ttsmsg={label}
-              tabIndex={keys.indexOf(key)}
+              tabindex={keys.indexOf(key)}
             >
               {label}
             </button>

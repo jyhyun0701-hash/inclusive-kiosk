@@ -145,7 +145,7 @@ const CertificateSelectPage = () => {
 						}}
 						data-tabfocus="Y"
 						data-tabgroup="certificate"
-						tabIndex={40}
+						tabindex={40}
 						data-ttsmsg="카테고리 검색."
 						aria-pressed={viewMode === "category"}
 					>
@@ -159,7 +159,7 @@ const CertificateSelectPage = () => {
 						}}
 						data-tabfocus="Y"
 						data-tabgroup="certificate"
-						tabIndex={41}
+						tabindex={41}
 						data-ttsmsg="명칭 검색."
 						aria-pressed={viewMode === "search"}
 					>
@@ -199,7 +199,7 @@ const CertificateSelectPage = () => {
 											}
 											data-tabfocus="Y"
 											data-tabgroup="certificate"
-											tabIndex={idx}
+											tabindex={idx}
 											data-ttsmsg={`${cert.nameKo}. 수수료 ${cert.fee ? cert.fee.toLocaleString() + "원" : "무료"}. 선택하려면 확인을 누르세요.`}
 											aria-label={cert.nameKo}
 										>
@@ -240,7 +240,7 @@ const CertificateSelectPage = () => {
 											}
 											data-tabfocus="Y"
 											data-tabgroup="certificate"
-											tabIndex={idx}
+											tabindex={idx}
 											data-ttsmsg={`${cert.nameKo}. 선택하려면 확인을 누르세요.`}
 										>
 											<ItemName>{cert.nameKo}</ItemName>

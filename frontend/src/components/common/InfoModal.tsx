@@ -97,7 +97,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose, language }) => {
           data-tabfocus="Y"
           data-tabgroup="modal-info"
           data-ttsmsg={c.confirm}
-          tabIndex={0}
+          tabindex={0}
         >
           {c.confirm}
         </button>

@@ -109,7 +109,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             ))}
           </div>
           <div className="modal-actions">
-            {/* tabIndex=0: 모달 진입 시 첫 포커스 */}
+            {/* tabindex=0: 모달 진입 시 첫 포커스 */}
             <button
               className="modal-btn confirm"
               onClick={handleConfirm}
@@ -117,7 +117,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               data-tabfocus="Y"
               data-tabgroup="modal-confirm"
               data-ttsmsg={`${l.confirm} - ${certName}`}
-              tabIndex={0}
+              tabindex={0}
               autoFocus
             >
               {l.confirm}
@@ -129,7 +129,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               data-tabfocus="Y"
               data-tabgroup="modal-confirm"
               data-ttsmsg={l.cancel}
-              tabIndex={1}
+              tabindex={1}
             >
               {l.cancel}
             </button>

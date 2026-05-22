@@ -23,11 +23,11 @@ const CategoryTabs = ({ categories, activeCategory, onSelect }: CategoryTabsProp
           role="tab"
           $isActive={activeCategory === cat}
           onClick={() => handleSelect(cat)}
-          /* 카테고리 탭은 certificate 그룹에서 tabIndex 50번대 사용
+          /* 카테고리 탭은 certificate 그룹에서 tabindex 50번대 사용
              (0~49는 증명서 아이템용) */
           data-tabfocus="Y"
           data-tabgroup="certificate"
-          tabIndex={50 + index}
+          tabindex={50 + index}
           data-ttsmsg={`${cat} 카테고리. 선택하려면 확인을 누르세요.`}
           aria-selected={activeCategory === cat}
         >

@@ -219,7 +219,7 @@ const closeKeypad = useCallback(() => {
             break;
           }
       case 'KEY_CORRECT': {
-        // numpad의 del 버튼 (tabIndex=9) 클릭
+        // numpad의 del 버튼 (tabindex=9) 클릭
         const delBtn = document.querySelector<HTMLElement>('[data-tabgroup="numpad"][tabindex="9"]');
         if (delBtn) { delBtn.click(); fm.playTtsFromElement(delBtn); }
         break;

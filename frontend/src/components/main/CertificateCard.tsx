@@ -21,7 +21,7 @@ const CertificateCard = ({
     <Card
       onClick={handleClick}
       aria-label={`${certificate.nameKo}${isFavorite ? ', 자주 찾는 증명서' : ''}`}
-      tabIndex={0}
+      tabindex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();

@@ -71,7 +71,6 @@ export const useFocusManager = (): FocusManager => {
           requestAnimationFrame(() => requestAnimationFrame(() => onFound(found)));
         } else if (Date.now() - start > timeout) {
           observer.disconnect();
-          console.warn(`[FM] waitForElement timeout: ${selector}`);
         }
       });
       observer.observe(doc.body, {
