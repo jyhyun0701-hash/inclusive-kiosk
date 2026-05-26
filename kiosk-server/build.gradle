@@ -42,7 +42,10 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+springBoot {
+    mainClass = 'com.kiosk.kioskserver.KioskApplication'
+}
+
 bootJar {
     enabled = true
-    mainClass = 'com.kiosk.kioskserver.KioskApplication'
 }
