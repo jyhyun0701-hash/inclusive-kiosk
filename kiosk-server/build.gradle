@@ -44,4 +44,5 @@ tasks.named('test') {
 
 bootJar {
     enabled = true
+    mainClass = 'com.kiosk.kioskserver.KioskApplication'
 }
