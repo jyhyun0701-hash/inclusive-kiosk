@@ -1,5 +1,5 @@
 # 1단계: 빌드
-FROM eclipse-temurin:17-jdk-jammy AS build
+FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 COPY . .
 RUN chmod +x gradlew
