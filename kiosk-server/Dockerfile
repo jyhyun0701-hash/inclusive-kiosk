@@ -1,6 +1,8 @@
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 COPY . .
+RUN ls -la /app/
+RUN ls -la /app/src/ 2>/dev/null || echo "NO SRC DIRECTORY FOUND"
 RUN chmod +x gradlew
 RUN ./gradlew bootJar -x test
 
