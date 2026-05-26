@@ -3,6 +3,7 @@ WORKDIR /app
 COPY . .
 RUN chmod +x gradlew
 RUN ./gradlew bootJar -x test
+RUN ls -la /app/build/libs/
 
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
